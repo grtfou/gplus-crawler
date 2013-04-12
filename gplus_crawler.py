@@ -2,10 +2,13 @@
 import urllib
 import re
 import os
+import datetime
 
 from lxml import etree
 
 class gplus_photo_crawler:
+    stop_download = False
+
     def __init__(self):
         # 1st is date. 2nd is photo url
         self.url_regx = re.compile(r",\[\"https:\/\/picasaweb.*\/(.*)#.*\[\"(.*)\"")
@@ -13,11 +16,17 @@ class gplus_photo_crawler:
     def _adjust_url(self, img_url):
         url_seg = img_url[1].split('/')
         url = "%s/d/%s" % ('/'.join(url_seg[:-2]), url_seg[-1])
-        filename = img_url[0][:8]   # ex. 20130101
+
+        if img_url[0][0] == '1':
+            filename = "20{0}".format(img_url[0])[:8]
+        else:
+            filename = img_url[0][:8]   # ex. 20130101
 
         return url, filename
 
     def get_url_context(self, id):
+        #id = '110216234612751595989'
+        #id = '105835152133357364264'
         url = 'https://plus.google.com/u/0/photos/{0}/albums/posts'.format(id)
 
         try:
@@ -45,7 +54,7 @@ class gplus_photo_crawler:
         except:
             return None
 
-    def main(self, id):
+    def main(self, id, start_date):
         urls = self.get_url_context(id)
 
         if urls:
@@ -56,7 +65,14 @@ class gplus_photo_crawler:
             old_filename = ''
             count = 1
             for url in urls:
+                if self.stop_download:
+                    break
+
                 download_url, filename = self._adjust_url(url)
+
+                if datetime.datetime.strptime(filename, "%Y%m%d") < datetime.datetime.strptime(start_date.isoformat(), "%Y-%m-%d"):
+                    break
+
                 print("Downloading: {0}".format(filename))
 
                 if filename == old_filename:
