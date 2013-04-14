@@ -70,8 +70,11 @@ class gplus_photo_crawler:
 
                 download_url, filename = self._adjust_url(url)
 
-                if datetime.datetime.strptime(filename, "%Y%m%d") < datetime.datetime.strptime(start_date.isoformat(), "%Y-%m-%d"):
-                    break
+                # try:
+                    # if datetime.datetime.strptime(filename, "%Y%m%d") < datetime.datetime.strptime(start_date.isoformat(), "%Y-%m-%d"):
+                        # break
+                # except:
+                    # pass
 
                 print("Downloading: {0}".format(filename))
 

@@ -27,7 +27,7 @@ class CountingThread(threading.Thread):
 
 class MainWindow(wx.Frame):
     def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title,  pos=(400, 400), size=(500,350))
+        wx.Frame.__init__(self, parent, title=title,  pos=(400, 400), size=(500,250))
 
         # A button
         self.button =wx.Button(self, label="Go Download!", pos=(300, 60))
@@ -38,18 +38,18 @@ class MainWindow(wx.Frame):
         #
         #vbox = wx.BoxSizer(wx.VERTICAL)
 
-        calend = cal.CalendarCtrl(self, -1, wx.DateTime_Now(),
-                                  style = cal.CAL_SHOW_HOLIDAYS |
-                                          cal.CAL_SEQUENTIAL_MONTH_SELECTION,
-                                  pos=(20,100))
+        # calend = cal.CalendarCtrl(self, -1, wx.DateTime_Now(),
+                                  # style = cal.CAL_SHOW_HOLIDAYS |
+                                          # cal.CAL_SEQUENTIAL_MONTH_SELECTION,
+                                  # pos=(20,100))
         #vbox.Add(calend, 0, wx.EXPAND | wx.ALL, 20)
-        self.Bind(cal.EVT_CALENDAR, self.OnCalSelected, id=calend.GetId())
+        # self.Bind(cal.EVT_CALENDAR, self.OnCalSelected, id=calend.GetId())
 
         # the edit control - one line version.
         self.lblname = wx.StaticText(self, label="google+ id:", pos=(20,60))
-        self.datetxt = wx.StaticText(self, -1, 'Start Date: {0}'.format(datetime.date.today().strftime('%Y-%m-%d')),
-                                           pos=(220,200))
-        self.picasa_id = wx.TextCtrl(self, value="107135851528812577523", pos=(150, 60), size=(140,-1))
+        #self.datetxt = wx.StaticText(self, -1, 'Start Date: {0} to Today'.format(datetime.date.today().strftime('%Y-%m-%d')),
+        #                                   pos=(220,200))
+        self.picasa_id = wx.TextCtrl(self, value="", pos=(150, 60), size=(140,-1))
         self.Bind(wx.EVT_TEXT_ENTER, self.EvtTextEnter, self.picasa_id)
 
         # Setting up the menu.
@@ -86,9 +86,9 @@ class MainWindow(wx.Frame):
         except:
             pass
 
-    def OnCalSelected(self, event):
-        self.start_date = event.PyGetDate()
-        self.datetxt.SetLabel('Start Date: {0}'.format(self.start_date.strftime('%Y-%m-%d')))
+    # def OnCalSelected(self, event):
+        # self.start_date = event.PyGetDate()
+        # self.datetxt.SetLabel('Start Date: {0} to Today'.format(self.start_date.strftime('%Y-%m-%d')))
 
     def OnAbout(self,e):
         # A message dialog box with an OK button. wx.OK is a standard ID in wxWidgets.
@@ -99,6 +99,7 @@ class MainWindow(wx.Frame):
 
     def OnExit(self,e):
         self.Close(True)  # Close the frame.
+        self.Destory()
 
 app = wx.App(False)
 frame = MainWindow(None, conf.UI_TITLE)
