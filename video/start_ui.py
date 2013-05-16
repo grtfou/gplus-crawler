@@ -11,7 +11,7 @@ from gplus_crawler import gplus_photo_crawler
 import threading
 
 class CountingThread(threading.Thread):
-    def __init__(self, crawler, picasa_id, start_date):
+    def __init__(self, crawler, picasa_id, is_new_first, start_date):
         """
         @param parent: The gui object that should recieve the value
         @param value: value to 'calculate' to
@@ -19,10 +19,11 @@ class CountingThread(threading.Thread):
         threading.Thread.__init__(self)
         self._crawler = crawler
         self._picasa_id = picasa_id
+        self._is_new_first = is_new_first
         self._start_date = start_date
 
     def run(self):
-        print self._crawler.main(self._picasa_id, self._start_date)
+        print self._crawler.main(self._picasa_id, self._is_new_first, self._start_date)
 
 
 class MainWindow(wx.Frame):
@@ -41,6 +42,10 @@ class MainWindow(wx.Frame):
                                           # cal.CAL_SEQUENTIAL_MONTH_SELECTION,
                                   # pos=(20,100))
         #self.Bind(cal.EVT_CALENDAR, self.OnCalSelected, id=calend.GetId())
+
+        # Checkbox
+        self.new_first = wx.CheckBox(self, label="New video download first", pos=(300, 120))
+        self.Bind(wx.EVT_CHECKBOX, self.EvtCheckBox, self.new_first)
 
         # the edit control - one line version.
         self.lblname = wx.StaticText(self, label="google+ id:", pos=(20,60))
@@ -68,12 +73,15 @@ class MainWindow(wx.Frame):
 
         self.Show(True)
 
+    def EvtCheckBox(self, event):
+        pass
+
     def EvtTextEnter(self, event):
         self.OnClick(event)
 
     def OnClick(self, event):
         self.my_exe = gplus_photo_crawler()
-        worker = CountingThread(self.my_exe, self.picasa_id.Value,
+        worker = CountingThread(self.my_exe, self.picasa_id.Value, self.new_first.GetValue(),
                                 self.start_date)
         worker.start()
 

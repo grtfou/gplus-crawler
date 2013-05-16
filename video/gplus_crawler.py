@@ -21,7 +21,7 @@ class gplus_photo_crawler:
     def _adjust_url(self, img_url):
         return img_url.replace('\u003d', '=').replace('\u0026', '&'), 'video'
 
-    def get_url_context(self, id):
+    def get_url_context(self, id, is_new_first):
         #id = '110216234612751595989'
         #id = '105835152133357364264'
         url = 'https://plus.google.com/u/0/photos/{0}/albums/posts'.format(id)
@@ -48,9 +48,10 @@ class gplus_photo_crawler:
 
                         video = OrderedDict(zip([key[1] for key in url], [key[0] for key in url]))
 
-                        temp_order = video.items()
-                        temp_order.reverse()
-                        video = OrderedDict(temp_order)
+                        if not(is_new_first):
+                            temp_order = video.items()
+                            temp_order.reverse()
+                            video = OrderedDict(temp_order)
 
                         return video.values()
 
@@ -58,8 +59,8 @@ class gplus_photo_crawler:
         except:
             return None
 
-    def main(self, id, start_date):
-        urls = self.get_url_context(id)
+    def main(self, id, is_new_first, start_date):
+        urls = self.get_url_context(id, is_new_first)
 
         if urls:
             # Create folder
@@ -103,4 +104,4 @@ class gplus_photo_crawler:
 
 # if __name__ == '__main__':
     # my_exe = gplus_photo_crawler()
-    # my_exe.main('102277090985412703374', '')
+    # my_exe.main('111907069956262615426', True, '')
