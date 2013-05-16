@@ -93,6 +93,6 @@ class gplus_photo_crawler:
 
             return ''
 
-if __name__ == '__main__':
-    my_exe = gplus_photo_crawler()
-    my_exe.main('110216234612751595989', '')
+# if __name__ == '__main__':
+    # my_exe = gplus_photo_crawler()
+    # my_exe.main('110216234612751595989', '')
