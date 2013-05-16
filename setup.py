@@ -11,7 +11,7 @@ includes = ["lxml", "lxml._elementpath", "lxml.etree",
             "gzip", "encodings.utf_8", "encodings.ascii"]
 
 setup(name='gplus_crawler',
-     version = "0.2.3",
+     version = "0.2.4",
      options = {
        "build_exe" : {
            "includes": includes,
