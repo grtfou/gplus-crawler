@@ -3,6 +3,7 @@ import urllib
 import re
 import os
 import datetime
+import contextlib
 
 from collections import OrderedDict
 
@@ -25,37 +26,37 @@ class gplus_photo_crawler:
         #id = '105835152133357364264'
         url = 'https://plus.google.com/u/0/photos/{0}/albums/posts'.format(id)
 
-        # try:
-        web_page = urllib.urlopen(url)
+        try:
+            with contextlib.closing(urllib.urlopen(url)) as web_page:
 
-        if web_page.getcode() != 200:
-            web_page.close()
-            raise
+                if web_page.getcode() != 200:
+                    web_page.close()
+                    raise
 
-        html_context = web_page.read()
-        web_page.close()
+                html_context = web_page.read()
+                web_page.close()
 
-        myparser = etree.HTMLParser(encoding="utf8")
-        context_tree = etree.HTML(html_context, parser=myparser)
+                myparser = etree.HTMLParser(encoding="utf8")
+                context_tree = etree.HTML(html_context, parser=myparser)
 
-        parse_result = context_tree.xpath('//script/text()')
+                parse_result = context_tree.xpath('//script/text()')
 
-        video = dict()
-        for node in parse_result:
-            if node.find("key: '27'") != -1:
-                url = self.video_regx.findall(node.encode('utf8'))
+                video = dict()
+                for node in parse_result:
+                    if node.find("key: '126'") != -1:
+                        url = self.video_regx.findall(node.encode('utf8'))
 
-                video = OrderedDict(zip([key[1] for key in url], [key[0] for key in url]))
+                        video = OrderedDict(zip([key[1] for key in url], [key[0] for key in url]))
 
-                temp_order = video.items()
-                temp_order.reverse()
-                video = OrderedDict(temp_order)
+                        temp_order = video.items()
+                        temp_order.reverse()
+                        video = OrderedDict(temp_order)
 
-                return video.values()
+                        return video.values()
 
-        return None
-        # except:
-            # return None
+            return None
+        except:
+            return None
 
     def main(self, id, start_date):
         urls = self.get_url_context(id)
@@ -102,4 +103,4 @@ class gplus_photo_crawler:
 
 # if __name__ == '__main__':
     # my_exe = gplus_photo_crawler()
-    # my_exe.main('110216234612751595989')
+    # my_exe.main('102277090985412703374', '')
