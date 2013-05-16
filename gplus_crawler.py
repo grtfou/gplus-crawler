@@ -3,6 +3,7 @@ import urllib
 import re
 import os
 import datetime
+import contextlib
 
 from lxml import etree
 
@@ -11,7 +12,7 @@ class gplus_photo_crawler:
 
     def __init__(self):
         # 1st is date. 2nd is photo url
-        self.url_regx = re.compile(r",\[\"https:\/\/picasaweb.*\/(.*)#.*\[\"(.*)\"")
+        self.url_regx = re.compile(r",.*\[\"https:\/\/picasaweb.*\/(.*)#.*\[\"(.*)\"")
 
     def _adjust_url(self, img_url):
         url_seg = img_url[1].split('/')
@@ -30,25 +31,23 @@ class gplus_photo_crawler:
         url = 'https://plus.google.com/u/0/photos/{0}/albums/posts'.format(id)
 
         try:
-            web_page = urllib.urlopen(url)
+            with contextlib.closing(urllib.urlopen(url)) as web_page:
+                if web_page.getcode() != 200:
+                    web_page.close()
+                    raise
 
-            if web_page.getcode() != 200:
+                html_context = web_page.read()
                 web_page.close()
-                raise
 
-            html_context = web_page.read()
-            web_page.close()
+                myparser = etree.HTMLParser(encoding="utf8")
+                context_tree = etree.HTML(html_context, parser=myparser)
 
-            myparser = etree.HTMLParser(encoding="utf8")
-            context_tree = etree.HTML(html_context, parser=myparser)
+                parse_result = context_tree.xpath('//script/text()')
 
-            parse_result = context_tree.xpath('//script/text()')
-
-            for node in parse_result:
-                if node.find("key: '27'") != -1:
-                    photo = self.url_regx.findall(node.encode('utf8'))
-
-                    return photo
+                for node in parse_result:
+                    if node.find("key: '126'") != -1:
+                        photo = self.url_regx.findall(node.encode('utf8'))
+                        return photo
 
             return None
         except:
@@ -94,6 +93,6 @@ class gplus_photo_crawler:
 
             return ''
 
-# if __name__ == '__main__':
-    # my_exe = gplus_photo_crawler()
-    # my_exe.main('110216234612751595989')
+if __name__ == '__main__':
+    my_exe = gplus_photo_crawler()
+    my_exe.main('110216234612751595989', '')
