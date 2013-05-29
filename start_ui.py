@@ -6,7 +6,7 @@ import datetime
 
 import configure as conf
 
-from gplus_crawler import gplus_photo_crawler
+from gplus_crawler import GplusPhotoCrawler
 
 import threading
 
@@ -75,7 +75,7 @@ class MainWindow(wx.Frame):
         self.OnClick(event)
 
     def OnClick(self, event):
-        self.my_exe = gplus_photo_crawler()
+        self.my_exe = GplusPhotoCrawler()
         worker = CountingThread(self.my_exe, self.picasa_id.Value,
                                 self.start_date)
         worker.start()

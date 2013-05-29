@@ -6,31 +6,58 @@ import datetime
 import contextlib
 
 from lxml import etree
+from StringIO import StringIO
 
-class gplus_photo_crawler:
+class GplusPhotoCrawler:
     stop_download = False
 
     def __init__(self):
-        # 1st is date. 2nd is photo url
-        self.url_regx = re.compile(r",.*\[\"https:\/\/picasaweb.*\/(.*)#.*\[\"(.*)\"")
+        pass
 
-    def _adjust_url(self, img_url):
-        url_seg = img_url[1].split('/')
-        url = "%s/d/%s" % ('/'.join(url_seg[:-2]), url_seg[-1])
+    def _format_url(self, origin_url):
+        url_seg = origin_url.split('/')
+        url = "{0}/s0/{1}".format('/'.join(url_seg[:-1]), url_seg[-1])
+        return url
 
-        if img_url[0][0] == '1':
-            filename = "20{0}".format(img_url[0])[:8]
-        else:
-            filename = img_url[0][:8]   # ex. 20130101
 
-        return url, filename
+    def get_album_urls(self, id):
+        url = 'https://picasaweb.google.com/data/feed/api/user/{0}'.format(id)
 
-    def get_url_context(self, id):
-        #id = '110216234612751595989'
-        #id = '105835152133357364264'
-        url = 'https://plus.google.com/u/0/photos/{0}/albums/posts'.format(id)
+        with contextlib.closing(urllib.urlopen(url)) as web_page:
+            if web_page.getcode() != 200:
+                web_page.close()
+                raise
 
-        try:
+            html_context = web_page.read()
+            web_page.close()
+
+            myparser = etree.XMLParser(ns_clean=True, encoding="utf8")
+            context_tree = etree.parse(StringIO(html_context), parser=myparser)
+            root = context_tree.getroot()
+
+            album_urls = set()
+
+            for rec in root.findall('{http://www.w3.org/2005/Atom}entry'):
+                for child in rec.findall(r'.//{http://www.w3.org/2005/Atom}link'):
+                    album_link = child.get('href')
+                    if 'feed' in album_link:
+                        album_urls.add(album_link)
+
+            return album_urls
+
+    def get_image_urls(self, album_urls, id):
+        if not os.path.isdir(id):
+            os.mkdir(id)
+
+        old_filename = ''
+        count = 1
+        published_date = None
+        download_url = ''
+
+        for url in reversed(sorted(album_urls)):
+            if self.stop_download:
+                break
+
             with contextlib.closing(urllib.urlopen(url)) as web_page:
                 if web_page.getcode() != 200:
                     web_page.close()
@@ -39,60 +66,47 @@ class gplus_photo_crawler:
                 html_context = web_page.read()
                 web_page.close()
 
-                myparser = etree.HTMLParser(encoding="utf8")
-                context_tree = etree.HTML(html_context, parser=myparser)
+                myparser = etree.XMLParser(ns_clean=True, encoding="utf8")
+                context_tree = etree.parse(StringIO(html_context), parser=myparser)
+                root = context_tree.getroot()
 
-                parse_result = context_tree.xpath('//script/text()')
+                for rec in root:
+                    for child in rec.findall(r'{http://www.w3.org/2005/Atom}*'):
 
-                for node in parse_result:
-                    if node.find("key: '126'") != -1:
-                        photo = self.url_regx.findall(node.encode('utf8'))
-                        return photo
+                        if child.tag == r'{http://www.w3.org/2005/Atom}published':
+                            published_date = child.text[:10].replace('-', '')
+                        elif child.tag == r'{http://www.w3.org/2005/Atom}content':
+                            download_url = self._format_url(child.get('src'))
+                        else:
+                            continue
 
-            return None
-        except:
-            return None
+                        if download_url and published_date:
+                            if published_date == old_filename:
+                                published_date = "{0}_{1}".format(published_date, count)
+                                count += 1
+                            else:
+                                old_filename = published_date
+                                count = 1
+
+                            urllib.urlretrieve(download_url, "{0}{1}{2}.jpg".format(id, os.sep, published_date))
+
+                            print("Downloading: {0}".format(published_date))
+                            published_date = None
+                            download_url = ''
 
     def main(self, id, start_date):
-        urls = self.get_url_context(id)
+        album_urls = None
+        try:
+            album_urls = self.get_album_urls(id)
+        except:
+            return 'Bad connection'
 
-        if urls:
-            # Create folder
-            if not os.path.isdir(id):
-                os.mkdir(id)
+        if not(album_urls):
+            return 'Not found any albums'
 
-            old_filename = ''
-            count = 1
-            for url in urls:
-                if self.stop_download:
-                    break
+        try:
+            self.get_image_urls(album_urls, id)
+        except:
+            return 'Bad connection'
 
-                download_url, filename = self._adjust_url(url)
-
-                # try:
-                    # if datetime.datetime.strptime(filename, "%Y%m%d") < datetime.datetime.strptime(start_date.isoformat(), "%Y-%m-%d"):
-                        # break
-                # except:
-                    # pass
-
-                print("Downloading: {0}".format(filename))
-
-                if filename == old_filename:
-                    new_filename = "{0}_{1}".format(filename, count)
-                    count+=1
-                else:
-                    new_filename = filename
-                    count = 1
-
-                urllib.urlretrieve(download_url, "{0}{1}{2}.jpg".format(id, os.sep, new_filename))
-                old_filename = filename
-
-            return 'Success'
-        else:
-            print('Bad connection')
-
-            return ''
-
-# if __name__ == '__main__':
-    # my_exe = gplus_photo_crawler()
-    # my_exe.main('110216234612751595989', '')
+        return 'Success'
