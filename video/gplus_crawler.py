@@ -1,4 +1,10 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#  @first_date    20130414
+#  @date          20130530
+#  @brief         Download(backup) Google plus videos
+from __future__ import print_function
+
 import urllib
 import os
 import contextlib
@@ -12,91 +18,112 @@ class GplusVideoCrawler:
     def __init__(self):
         pass
 
-    def get_album_urls(self, id):
-        url = 'https://picasaweb.google.com/data/feed/api/user/{0}'.format(id)
-
+    def _get_url_data(self, url):
         with contextlib.closing(urllib.urlopen(url)) as web_page:
             if web_page.getcode() != 200:
                 web_page.close()
-                raise
+                return None
 
             html_context = web_page.read()
             web_page.close()
+
+        return html_context
+
+    """
+    @desc   Get all album urls
+    """
+    def get_album_urls(self, id):
+        url = 'https://picasaweb.google.com/data/feed/api/user/{0}'.format(id)
+
+        html_context = self._get_url_data(url)
+        if not(html_context):
+            raise
+
+        myparser = etree.XMLParser(ns_clean=True, encoding="utf8")
+        context_tree = etree.parse(StringIO(html_context), parser=myparser)
+
+        root = context_tree.getroot()
+
+        album_urls = []
+
+        pattern = "{http://www.w3.org/2005/Atom}entry//{http://www.w3.org/2005/Atom}link"
+
+        for rec in root.findall(pattern):
+            if 'feed' in rec.get('href'):
+                album_urls.append(rec.get('href'))
+
+        return album_urls
+
+    """
+    @desc   Traveled all album and download all videos
+    """
+    def get_image_urls(self, album_urls, id):
+        if not os.path.isdir(id):
+            os.mkdir(id)
+
+        download_url = ''
+        previous_date = ''
+        published_date = None
+        count = 1
+
+        for url in album_urls:
+            print('.', end='')
+            if self.stop_download:
+                break
+
+            html_context = self._get_url_data(url)
+            if not(html_context):
+                raise
 
             myparser = etree.XMLParser(ns_clean=True, encoding="utf8")
             context_tree = etree.parse(StringIO(html_context), parser=myparser)
             root = context_tree.getroot()
 
-            album_urls = []
+            pattern = "{http://www.w3.org/2005/Atom}entry//"
+            group_pattern = "{http://search.yahoo.com/mrss/}content[last()]"
 
-            for rec in root.findall('{http://www.w3.org/2005/Atom}entry'):
-                for child in rec.findall(r'.//{http://www.w3.org/2005/Atom}link'):
-                    album_link = child.get('href')
-                    if 'feed' in album_link:
-                        album_urls.append(album_link)
+            for rec in root.findall(pattern):
+                if rec.tag == r'{http://www.w3.org/2005/Atom}published':    # date
+                    published_date = rec.text[:10].replace('-', '')
+                elif rec.tag == r'{http://search.yahoo.com/mrss/}group':    # video level
+                    for v_url in rec.findall(group_pattern):
+                        download_url = v_url.get('url')
 
-            return album_urls
+                        if 'googlevideo' not in download_url:
+                            published_date = None
+                            download_url = ''
+                            break
 
-    def get_image_urls(self, album_urls, id):
-        if not os.path.isdir(id):
-            os.mkdir(id)
+                        # Test url is vaild
+                        v_page = self._get_url_data(download_url)
+                        if not(v_page):
+                            published_date = None
+                            download_url = ''
+                            break
 
-        old_filename = ''
-        count = 1
-        published_date = None
-        download_url = ''
+                else:
+                    continue
 
-        for url in album_urls:
-            if self.stop_download:
-                break
 
-            with contextlib.closing(urllib.urlopen(url)) as web_page:
-                if web_page.getcode() != 200:
-                    web_page.close()
-                    raise
+                # Download
+                if download_url and published_date:
+                    if published_date == previous_date:
+                        published_date = "{0}_{1}".format(published_date, count)
+                        count += 1
+                    else:
+                        previous_date = published_date
+                        count = 1
 
-                html_context = web_page.read()
-                web_page.close()
+                    print("\nDownloading: {0}".format(published_date))
+                    # Is file exist and skip
+                    if os.path.isfile("{0}{1}{2}.mp4".format(id, os.sep, published_date)):
+                        print('File Existence')
 
-                myparser = etree.XMLParser(ns_clean=True, encoding="utf8")
-                context_tree = etree.parse(StringIO(html_context), parser=myparser)
-                root = context_tree.getroot()
+                    else:
+                        urllib.urlretrieve(download_url, "{0}{1}{2}.mp4".format(id, os.sep, published_date))
 
-                for rec in root:
-                    for child in rec:
-
-                        if child.tag == r'{http://www.w3.org/2005/Atom}published':
-                            published_date = child.text[:10].replace('-', '')
-                        elif child.tag == r'{http://search.yahoo.com/mrss/}group':
-                            for abc in child:
-                                if abc.tag == '{http://search.yahoo.com/mrss/}content':
-                                    if 'googlevideo' in abc.get('url'):
-                                        download_url = abc.get('url')
-
-                                        with contextlib.closing(urllib.urlopen(download_url)) as download_page:
-                                            if download_page.getcode() != 200:
-                                                download_url = ''
-                                                break
-                        else:
-                            continue
-
-                        if download_url and published_date:
-                            if published_date == old_filename:
-                                published_date = "{0}_{1}".format(published_date, count)
-                                count += 1
-                            else:
-                                old_filename = published_date
-                                count = 1
-
-                            # if os.path.isfile("{0}{1}{2}.mp4".format(id, os.sep, new_filename)):
-                                # print 'File Existence'
-                                # old_filename = filename
-                                # continue
-
-                                print("Downloading: {0}".format(published_date))
-                                urllib.urlretrieve(download_url, "{0}{1}{2}.mp4".format(id, os.sep, published_date))
-                                published_date = None
-                                download_url = ''
+                    published_date = None
+                    download_url = ''
 
     def main(self, id, is_new_first, start_date):
         album_urls = None
@@ -117,7 +144,3 @@ class GplusVideoCrawler:
             return 'Bad connection'
 
         return 'Success'
-
-if __name__ == '__main__':
-    my_exe = GplusVideoCrawler()
-    my_exe.main('111907069956262615426', False, '')

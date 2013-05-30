@@ -16,6 +16,17 @@ class GplusPhotoCrawler:
     def __init__(self):
         pass
 
+    def _get_url_data(self, url):
+        with contextlib.closing(urllib.urlopen(url)) as web_page:
+            if web_page.getcode() != 200:
+                web_page.close()
+                return None
+
+            html_context = web_page.read()
+            web_page.close()
+
+        return html_context
+
     """
     @desc   Replace download url to new url of full size image
     """
@@ -31,27 +42,23 @@ class GplusPhotoCrawler:
     def get_album_urls(self, id):
         url = 'https://picasaweb.google.com/data/feed/api/user/{0}'.format(id)
 
-        with contextlib.closing(urllib.urlopen(url)) as web_page:
-            if web_page.getcode() != 200:
-                web_page.close()
-                raise
+        html_context = self._get_url_data(url)
+        if not(html_context):
+            raise
 
-            html_context = web_page.read()
-            web_page.close()
+        myparser = etree.XMLParser(ns_clean=True, encoding="utf8")
+        context_tree = etree.parse(StringIO(html_context), parser=myparser)
+        root = context_tree.getroot()
 
-            myparser = etree.XMLParser(ns_clean=True, encoding="utf8")
-            context_tree = etree.parse(StringIO(html_context), parser=myparser)
-            root = context_tree.getroot()
+        album_urls = []
 
-            album_urls = []
+        pattern = "{http://www.w3.org/2005/Atom}entry//{http://www.w3.org/2005/Atom}link"
 
-            pattern = "{http://www.w3.org/2005/Atom}entry//{http://www.w3.org/2005/Atom}link"
+        for rec in root.findall(pattern):
+            if 'feed' in rec.get('href'):
+                album_urls.append(rec.get('href'))
 
-            for rec in root.findall(pattern):
-                if 'feed' in rec.get('href'):
-                    album_urls.append(rec.get('href'))
-
-            return album_urls
+        return album_urls
 
     """
     @desc   Traveled all album and download all images
@@ -70,42 +77,38 @@ class GplusPhotoCrawler:
             if self.stop_download:
                 break
 
-            with contextlib.closing(urllib.urlopen(url)) as web_page:
-                if web_page.getcode() != 200:
-                    web_page.close()
-                    raise
+            html_context = self._get_url_data(url)
+            if not(html_context):
+                raise
 
-                html_context = web_page.read()
-                web_page.close()
+            myparser = etree.XMLParser(ns_clean=True, encoding="utf8")
+            context_tree = etree.parse(StringIO(html_context), parser=myparser)
+            root = context_tree.getroot()
 
-                myparser = etree.XMLParser(ns_clean=True, encoding="utf8")
-                context_tree = etree.parse(StringIO(html_context), parser=myparser)
-                root = context_tree.getroot()
+            pattern = "{http://www.w3.org/2005/Atom}entry//"
 
-                pattern = "{http://www.w3.org/2005/Atom}entry//"
+            for rec in root.findall(pattern):
+                if rec.tag == r'{http://www.w3.org/2005/Atom}published':    # date
+                    published_date = rec.text[:10].replace('-', '')
+                elif rec.tag == r'{http://www.w3.org/2005/Atom}content':    # image url
+                    download_url = self._format_url(rec.get('src'))
+                else:
+                    continue
 
-                for rec in root.findall(pattern):
-                    if rec.tag == r'{http://www.w3.org/2005/Atom}published':    # date
-                        published_date = rec.text[:10].replace('-', '')
-                    elif rec.tag == r'{http://www.w3.org/2005/Atom}content':    # image url
-                        download_url = self._format_url(rec.get('src'))
+                if download_url and published_date:
+                    # Check filename overlap, if TRUE then rename
+                    if published_date == previous_date:
+                        published_date = "{0}_{1}".format(published_date, count)
+                        count += 1
                     else:
-                        continue
+                        previous_date = published_date
+                        count = 1
 
-                    if download_url and published_date:
-                        # Check filename overlap, if TRUE then rename
-                        if published_date == previous_date:
-                            published_date = "{0}_{1}".format(published_date, count)
-                            count += 1
-                        else:
-                            previous_date = published_date
-                            count = 1
+                    urllib.urlretrieve(download_url, "{0}{1}{2}.jpg".format(id, os.sep, published_date))
 
-                        urllib.urlretrieve(download_url, "{0}{1}{2}.jpg".format(id, os.sep, published_date))
-
-                        print("Downloading: {0}.jpg".format(published_date))
-                        published_date = None
-                        download_url = ''
+                    print("Downloading: {0}.jpg".format(published_date))
+                    published_date = None
+                    download_url = ''
 
 
     def main(self, id, start_date):
