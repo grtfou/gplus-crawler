@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import urllib
-import re
 import os
-import datetime
 import contextlib
 
 from lxml import etree
