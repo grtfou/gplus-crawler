@@ -1,4 +1,5 @@
 import sys
+import configure
 from cx_Freeze import setup, Executable
 
 # base = None
@@ -11,7 +12,7 @@ includes = ["lxml", "lxml._elementpath", "lxml.etree",
             "gzip", "encodings.utf_8", "encodings.ascii"]
 
 setup(name='gplus_crawler',
-     version = "0.2.4",
+     version = configure.VERSION,
      options = {
        "build_exe" : {
            "includes": includes,

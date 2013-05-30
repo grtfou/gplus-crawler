@@ -2,6 +2,7 @@
 import os
 import wx
 import wx.calendar as cal
+import wx.lib.agw.hyperlink as hl
 import datetime
 
 import configure as conf
@@ -59,8 +60,8 @@ class MainWindow(wx.Frame):
         menuExit = aboutmenu.Append(wx.ID_EXIT,"E&xit"," Terminate the program")
 
         menuBar = wx.MenuBar()
-        menuBar.Append(aboutmenu, "&About") # Adding the "aboutmenu" to the MenuBar
-        self.SetMenuBar(menuBar)  # Adding the MenuBar to the Frame content.
+        menuBar.Append(aboutmenu, "&About")
+        self.SetMenuBar(menuBar)
 
         # Set events.
         self.Bind(wx.EVT_MENU, self.OnAbout, menuAbout)
@@ -90,15 +91,16 @@ class MainWindow(wx.Frame):
         # self.start_date = event.PyGetDate()
         # self.datetxt.SetLabel('Start Date: {0} to Today'.format(self.start_date.strftime('%Y-%m-%d')))
 
-    def OnAbout(self,e):
-        # A message dialog box with an OK button. wx.OK is a standard ID in wxWidgets.
+    def OnAbout(self, event):
         about_txt = conf.MENU_ABOUT_TXT
         dlg = wx.MessageDialog(self, about_txt, conf.MENU_ABOUT_TITLE, wx.OK)
-        dlg.ShowModal() # Show it
-        dlg.Destroy() # finally destroy it when finished.
+        # hyper1 = hl.HyperLinkCtrl(self, -1, "https://code.google.com/p/gplus-crawler/",
+                                  # URL="https://code.google.com/p/gplus-crawler/")
+        dlg.ShowModal()
+        dlg.Destroy()
 
-    def OnExit(self,e):
-        self.Close(True)  # Close the frame.
+    def OnExit(self, event):
+        self.Close(True)
         self.Destory()
 
 app = wx.App(False)
