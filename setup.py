@@ -1,4 +1,3 @@
-import sys
 import configure
 from cx_Freeze import setup, Executable
 
@@ -8,8 +7,9 @@ from cx_Freeze import setup, Executable
 
 copyDependentFiles=True
 silent = True
-includes = ["lxml", "lxml._elementpath", "lxml.etree",
-            "gzip", "encodings.utf_8", "encodings.ascii"]
+# includes = ["lxml", "lxml._elementpath", "lxml.etree",
+#             "gzip", "encodings.utf_8", "encodings.ascii"]
+includes = ["gzip", "encodings.utf_8", "encodings.ascii"]
 
 setup(name='gplus_crawler',
      version = configure.VERSION,
