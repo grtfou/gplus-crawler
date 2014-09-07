@@ -109,10 +109,7 @@ class GplusVideoCrawler(object):
             count = 1
             old_filename = ""
 
-            ii = open('ttt.txt', 'a')
-
             for line in web_page:
-                ii.write(line)
                 line = line.strip()
 
                 ### photo or video ###
@@ -162,8 +159,6 @@ class GplusVideoCrawler(object):
                 if self.stop_download:
                     self.stop_download = False
                     break
-
-            ii.close()
 
     ##
     #  @brief       Main function
