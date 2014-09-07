@@ -1,35 +1,44 @@
-=============
 gplus_crawler
 =============
+
+README Last Updated on 2014.09.07
 
 Introduction
 ============
 
-寫這個工具原始目的，主要只是拿來備份Google plus
+備份 Google Plus (Google+) ``訊息裡的圖片(Picture)`` and ``影片 (Video)``
 
-「訊息裡附的圖片(Pictures) 和 影片 (Videos)」
 
-How to use (怎麼使用)
-======================
-* 下載它 (免安裝-portable)
+Requirements
+============
+  + Python 2.7
 
-* 解壓縮，執行資料夾裡的：start_ui.exe
+  + lxml
 
-* 會有一個視窗：叫你輸入備份對象的Google+ id
+  + wxPython (For UI)
 
-  + 例如: 105229500895781124316
 
-* 按下Go Download! 就會在資料夾裡開一個id的資料夾，開始下載
+About How to Use
+==================
+  * Download it (portable)
 
-* 按下Stop可以中斷下載
+    * https://code.google.com/p/gplus-crawler/downloads/list
+
+  * Uncompress and execute ``start_ui.exe`` to run
+
+  * Input Google+ id that you want to backup (download) user into text field
+
+    * ex: 105229500895781124316
+
+  * Press ``Go Download!`` button
+
+  * If yout want to ``Stop``, press ``Stop`` button
 
 P.S.
 =====
 
-* 只能備份「訊息裡附加的相片與影片」
+  * Just backup (download) pictures and videos in the message
 
-* If file exists, skip downloading.
+  * If file name exists, it will skip that picture.
 
-  + 如果已經有同檔名的了，則會跳過下載，想重新下載請刪除舊檔
-
-* The best video quality (最高畫質)
+  * The best video quality
