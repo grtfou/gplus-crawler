@@ -60,7 +60,7 @@ class MainWindow(wx.Frame):
         self.lblname = wx.StaticText(self, label="google+ id:", pos=(20,60))
         # self.datetxt = wx.StaticText(self, -1, 'Start Date: {0} to Today'.format(datetime.date.today().strftime('%Y-%m-%d')),
                                            # pos=(220,200))
-        self.picasa_id = wx.TextCtrl(self, value="111907069956262615426", pos=(150, 60), size=(160,-1))
+        self.picasa_id = wx.TextCtrl(self, value="108862052279750773861", pos=(150, 60), size=(160,-1))
         self.Bind(wx.EVT_TEXT_ENTER, self.EvtTextEnter, self.picasa_id)
 
         # Setting up the menu.
@@ -101,7 +101,8 @@ class MainWindow(wx.Frame):
 
     def StopDownload(self, event):
         try:
-            self.my_exe.stop_download = True
+            self.my_exe.p_downloader.stop_download = True
+            self.my_exe.v_downloader.stop_download = True
         except:
             pass
 

@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #  @first_date    20130414
-#  @date          20131002
-#  @version       1.3 - New method for download fast
+#  @date          20140907
+#  @version       1.3 (20131002) - New method for download fast
 #                 1.2 - Redesigned web crawler for more performance
 #                 1.0 - Implemented for new G+ format (20130530)
-#  @brief         Download(backup) Google plus videos
-# from __future__ import print_function
+#  @brief         Main function
 
 import urllib
 import urllib2
@@ -16,8 +15,13 @@ import re
 import sys
 from collections import OrderedDict
 
+from video_crawler import VideoCrawler
+from pic_crawler import PicCrawler
+
 class GplusVideoCrawler(object):
-    stop_download = False
+    # stop_download = False
+    p_downloader = PicCrawler()
+    v_downloader = VideoCrawler()
 
     def __init__(self):
         # inside quote is video key. Outside quote is photo url
@@ -108,138 +112,6 @@ class GplusVideoCrawler(object):
             return photo_list, video_urls
 
     ##
-    #  @brief       For photo url use. Parser url to format filename
-    #  @param       (Tuple) [0] : Date
-    #                       [1] : photo url
-    #  @return      (String) Url
-    #               (String) Filename (format by date)
-    #
-    def _adjust_url(self, img_url):
-        url_seg = img_url[1].split('/')
-        url = "%s/d/%s" % ('/'.join(url_seg[:-2]), url_seg[-1])
-
-        try:
-            if img_url[0][0] == '1':
-                filename = "20{0}".format(img_url[0])[:8]
-            else:
-                filename = img_url[0][:8]   # ex. 20130101
-        except:
-            filename = img_url[0]
-
-        return url, filename
-
-    ##
-    #  @brief       For video download have download progress bar
-    #  @param       (Integer) number of block
-    #               (Integer) size of block
-    #               (Integer) total size
-    #
-    def _report_hook(self, blocknum, blocksize, totalsize):
-        percent = 100.0 * blocknum * blocksize / totalsize
-        if percent > 100: percent = 100
-        sys.stdout.write("\r%2d%%" % percent)
-        sys.stdout.flush()
-
-    ##
-    #  @brief       Main function by download photo
-    #  @param       (Integer) uid
-    #               (Tuple) [0]: (string) date
-    #                       [1]: (string) photo urls
-    #
-    def _photo_download(self, uid, photo_list):
-        old_filename = ''
-        count = 1
-        if photo_list:
-            # Create folder
-            folder_path = '{0}{1}{2}'.format(uid, os.sep, 'photo')
-            if not os.path.isdir(folder_path):
-                os.mkdir(folder_path)
-            #-create
-
-            for url in photo_list:
-                if self.stop_download:
-                    break
-
-                download_url, filename = self._adjust_url(url)
-
-                print("Downloading: {0}".format(filename))
-
-                if filename == old_filename:
-                    new_filename = "{0}_{1}".format(filename, count)
-                    count += 1
-                else:
-                    new_filename = filename
-                    count = 1
-
-                old_filename = filename
-                ### Avoid download the same video by filename ###
-                if os.path.isfile("{0}{1}{2}.jpg".format(folder_path, os.sep, new_filename)):
-                    print('File Existence: {0}'.format(new_filename))
-                    continue
-                ###-avoid
-
-                # urllib.urlretrieve(download_url, "{0}{1}{2}.jpg".format(folder_path, os.sep, new_filename))
-                ### Download ###
-                path = "{0}{1}{2}.jpg".format(folder_path, os.sep, new_filename)
-                with contextlib.closing(urllib2.urlopen(download_url)) as response:
-                    if response.getcode() == 200:
-                        with open(path, 'wb') as o_f:
-                            o_f.write(response.read())
-                ###-download
-
-            return 1
-        else:
-            return 0
-
-    ##
-    #  @brief       Main function by download video
-    #  @param       (Integer) uid
-    #               (OrderedDict) key:   (string) video key
-    #                             value: (string) video url
-    #
-    def _video_download(self, uid, video_urls):
-        old_filename = ''
-        count = 1
-        if video_urls:
-            # Create folder
-            folder_path = '{0}{1}{2}'.format(uid, os.sep, 'video')
-            if not os.path.isdir(folder_path):
-                os.mkdir(folder_path)
-            #-create
-
-            for video_date, download_url in video_urls.iteritems():
-                if self.stop_download:
-                    break
-
-                filename = video_date.split('_')[0]
-                print("Downloading: {0}".format(filename))
-
-
-                ### if one day has two videos  ###
-                if filename == old_filename:
-                    new_filename = "{0}_{1}".format(filename, count)
-                    count += 1
-                else:
-                    new_filename = filename
-                    count = 1
-                ###-if
-                old_filename = filename
-
-                ### Avoid download the same video by filename ###
-                if os.path.isfile("{0}{1}{2}.3gp".format(folder_path, os.sep, new_filename)):
-                    print('File Existence: {0}'.format(new_filename))
-                    continue
-                ###-avoid
-
-                # Download
-                urllib.urlretrieve(download_url, "{0}{1}{2}.3gp".format(folder_path, os.sep, new_filename), self._report_hook)
-                print('')
-
-            return 1
-        else:
-            return 0
-
-    ##
     #  @brief       Main function
     #  @param       (Integer) user id
     #               (String) photo / video by download
@@ -255,12 +127,15 @@ class GplusVideoCrawler(object):
         status = 0
         # photo
         if d_type == 'photo':
-            status = self._photo_download(uid, photo_list)
+            status = self.p_downloader.get_pic(uid, photo_list)
 
         # video
         if d_type == 'video':
-            status = self._video_download(uid, video_urls)
+            status = self.v_downloader.get_video(uid, video_urls)
 
+
+        self.p_downloader.stop_download = False
+        self.v_downloader.stop_download = False
         if status == 1:
             return '========== Success =========='
 
