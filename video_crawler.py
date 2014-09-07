@@ -29,6 +29,9 @@ class VideoCrawler():
     #                             value: (string) video url
     #
     def get_video(self, uid, video_urls):
+        print(video_urls)
+
+
         old_filename = ''
         count = 1
         if video_urls:
@@ -42,6 +45,7 @@ class VideoCrawler():
                 if self.stop_download:
                     break
 
+                print(download_url)
                 filename = video_date.split('_')[0]
                 print("Downloading: {0}".format(filename))
 

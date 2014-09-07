@@ -26,10 +26,15 @@ class GplusVideoCrawler(object):
     def __init__(self):
         # inside quote is video key. Outside quote is photo url
         # video regx  (url: http://redirector.googlevideo.com/videoplayback?id)
-        self.video_regx = re.compile(r",\[.*\"(http:\/\/redirector.googlevideo.com\/videoplayback\?id\\u003d(.*)\\u0026itag.*)\"\]")
-        # get date regx
-        # self.date_regx = re.compile(r".*,\"([0-9_]+).mp4\",500,,")
-        self.date_regx = re.compile(r".*,\[1,\"http.*\/([0-9_]+).mp4")
+
+        # g+ source code
+        # regx_txt = ur"^,\[&quot;.*(http[s]{0,1}:\/\/redirector.googlevideo.com\/videoplayback.*)\]$"
+        regx_txt = ur".*(https://redirector.googlevideo.com.*)\"\]$"
+        self.video_regx = re.compile(regx_txt)
+
+        # regx_txt = r".*,\[1,\"http.*\/([0-9_]+).mp4"
+        regx_txt = ur".*(20[0-9]{1}[0-9]{1}/[0-1][0-9]/[0-3][0-9]).*"
+        self.date_regx = re.compile(regx_txt)
 
         # photo regx
         self.photo_regx = re.compile(r",.*\[\"https:\/\/picasaweb.*\/(.*)#.*\[\"(.*)\"")
@@ -69,6 +74,18 @@ class GplusVideoCrawler(object):
         return req
 
     ##
+    #  @brief       For video download have download progress bar
+    #  @param       (Integer) number of block
+    #               (Integer) size of block
+    #               (Integer) total size
+    #
+    def _report_hook(self, blocknum, blocksize, totalsize):
+        percent = 100.0 * blocknum * blocksize / totalsize
+        if percent > 100: percent = 100
+        sys.stdout.write("\r%2d%%" % percent)
+        sys.stdout.flush()
+
+    ##
     #  @brief       Get urls by raw of html page
     #  @param       (String) uid
     #               (Boolean) For download video use. Can download lastest video first.
@@ -83,33 +100,32 @@ class GplusVideoCrawler(object):
                 web_page.close()
                 return None, None
 
-            html_context = web_page.read()
-            web_page.close()
 
-            # if use LXML
-            # myparser = etree.HTMLParser(encoding="utf8")
-            # context_tree = etree.HTML(html_context, parser=myparser)
-            # parse_result = context_tree.xpath('//script/text()')
 
-            video_list = self.video_regx.findall(html_context)
-            date_list = self.date_regx.findall(html_context)
-            photo_list = self.photo_regx.findall(html_context)
+            date_list = ""
+            video_list = ""
+            for line in web_page:
+                line = line.strip()
+                new_video = self.video_regx.match(line)
+                new_date = self.date_regx.match(line)
 
-            ### remove duplicate video and get url of best quality video ###
-            urls = {}
-            for url in video_list:
-                urls[url[1]] = url[0].decode('unicode_escape')
-            ###-remove
+                if new_video:
+                    video_list = new_video
 
-            video_urls = OrderedDict(zip(date_list, urls.values()))
+                if new_date:
+                    date_list = new_date
 
-            # Sort by date
-            if not(is_new_first):
-                temp_order = video_urls.items()
-                temp_order.reverse()
-                video_urls = OrderedDict(temp_order)
 
-            return photo_list, video_urls
+                if date_list and video_list and line == ']':
+                    filename = date_list.group(1).replace('/','-')+".mp4"
+                    video_url = video_list.group(1).replace('\u003d', '=').replace('\u0026', '&')
+                    # urllib.urlretrieve(video_url, filename, self._report_hook)
+                    video_list = ""
+                    date_list = ""
+
+
+
+            # return photo_list, video_urls
 
     ##
     #  @brief       Main function
@@ -127,11 +143,14 @@ class GplusVideoCrawler(object):
         status = 0
         # photo
         if d_type == 'photo':
-            status = self.p_downloader.get_pic(uid, photo_list)
+            pass
+            # status = self.p_downloader.get_pic(uid, photo_list)
 
         # video
         if d_type == 'video':
-            status = self.v_downloader.get_video(uid, video_urls)
+            pass
+            # urllib.urlretrieve(video_url, filename, self._report_hook)
+            # status = self.v_downloader.get_video(uid, video_urls)
 
 
         self.p_downloader.stop_download = False
@@ -146,4 +165,4 @@ if __name__ == '__main__':
     my_tester = GplusVideoCrawler()
     #uid = '110216234612751595989'
     #uid = '105835152133357364264'
-    print(my_tester.main('111907069956262615426', 'video', False))
+    print(my_tester.main('108862052279750773861', 'video', False))

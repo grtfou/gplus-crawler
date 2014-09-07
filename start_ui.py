@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #  @first_date    20130414
-#  @date          20131002
-#  @version       1.0 - Implemented
+#  @date          20140907 - Enhanced "stop download" feature
 #  @brief         UI
 import wx
 # import wx.calendar as cal
