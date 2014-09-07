@@ -15,18 +15,19 @@ import re
 import sys
 from collections import OrderedDict
 
-from video_crawler import VideoCrawler
-from pic_crawler import PicCrawler
+# from video_crawler import VideoCrawler
+# from pic_crawler import PicCrawler
 
 class GplusVideoCrawler(object):
-    # stop_download = False
-    p_downloader = PicCrawler()
-    v_downloader = VideoCrawler()
+    stop_download = False
+    # p_downloader = PicCrawler()
+    # v_downloader = VideoCrawler()
 
     def __init__(self):
         # inside quote is video key. Outside quote is photo url
-        # video regx  (url: http://redirector.googlevideo.com/videoplayback?id)
 
+        ### video regex ###
+        # (url: http://redirector.googlevideo.com/videoplayback?id)
         # g+ source code
         # regx_txt = ur"^,\[&quot;.*(http[s]{0,1}:\/\/redirector.googlevideo.com\/videoplayback.*)\]$"
         regx_txt = ur".*(https://redirector.googlevideo.com.*)\"\]$"
@@ -36,8 +37,11 @@ class GplusVideoCrawler(object):
         regx_txt = ur".*(20[0-9]{1}[0-9]{1}/[0-1][0-9]/[0-3][0-9]).*"
         self.date_regx = re.compile(regx_txt)
 
-        # photo regx
-        self.photo_regx = re.compile(r",.*\[\"https:\/\/picasaweb.*\/(.*)#.*\[\"(.*)\"")
+        ### photo regex ###
+        # old regex
+        # regx_txt = ur",.*\[\"https:\/\/picasaweb.*\/(.*)#.*\[\"(.*)\""
+        regx_txt = ur"^,.*https://picasaweb.google.com/[0-9]*/([0-9]*)#.*\[\"(http[s]{0,1}:\/\/.*)\".*\]$"
+        self.photo_regx = re.compile(regx_txt)
 
     ##
     #  @brief       Arrage request for get raw html page
@@ -92,7 +96,7 @@ class GplusVideoCrawler(object):
     #  @return      (Tuple) photo list
     #               (OrderedDict) video list
     #
-    def _get_url_context(self, uid, is_new_first):
+    def _get_url_context(self, uid, d_type):
         page_req = self._get_raw_page(uid)
 
         with contextlib.closing(urllib2.urlopen(page_req)) as web_page:
@@ -100,32 +104,66 @@ class GplusVideoCrawler(object):
                 web_page.close()
                 return None, None
 
-
-
             date_list = ""
             video_list = ""
+            count = 1
+            old_filename = ""
+
+            ii = open('ttt.txt', 'a')
+
             for line in web_page:
+                ii.write(line)
                 line = line.strip()
-                new_video = self.video_regx.match(line)
-                new_date = self.date_regx.match(line)
 
-                if new_video:
-                    video_list = new_video
+                ### photo or video ###
+                if d_type == "video":
+                    new_video = self.video_regx.match(line)
+                    new_date = self.date_regx.match(line)
 
-                if new_date:
-                    date_list = new_date
+                    if new_video:
+                        video_list = new_video
 
-
-                if date_list and video_list and line == ']':
-                    filename = date_list.group(1).replace('/','-')+".mp4"
-                    video_url = video_list.group(1).replace('\u003d', '=').replace('\u0026', '&')
-                    # urllib.urlretrieve(video_url, filename, self._report_hook)
-                    video_list = ""
-                    date_list = ""
+                    if new_date:
+                        date_list = new_date
 
 
+                    if date_list and video_list and line == ']':
+                        filename = date_list.group(1).replace('/','-') + ".mp4"
+                        video_url = video_list.group(1).replace('\u003d', '=').replace('\u0026', '&')
+                        print(filename)
+                        filename = '{0}{1}video{1}{2}'.format(uid, os.sep, filename)
+                        # urllib.urlretrieve(video_url, filename, self._report_hook)
+                        video_list = ""
+                        date_list = ""
+                        print("\n")
+                elif d_type == "photo":
+                    new_photo = self.photo_regx.match(line)
+                    if new_photo:
+                        filename = ""
+                        if len(new_photo.group(1)) > 8:
+                            filename = new_photo.group(1)[:8] + "-" + new_photo.group(1)[8:]
+                        else:
+                            filename = new_photo.group(1)
 
-            # return photo_list, video_urls
+                        print(filename)
+                        if filename == old_filename:
+                            filename += "_{}".format(count)
+                            count += 1
+                        else:
+                            count = 1
+                            old_filename = filename
+
+                        filename = '{0}{1}photo{1}{2}'.format(uid, os.sep, filename)
+                        photo_url = new_photo.group(2)
+                        # urllib.urlretrieve(photo_url, filename + ".jpg", self._report_hook)
+                        print("\n")
+            ###-
+
+                if self.stop_download:
+                    self.stop_download = False
+                    break
+
+            ii.close()
 
     ##
     #  @brief       Main function
@@ -133,36 +171,28 @@ class GplusVideoCrawler(object):
     #               (String) photo / video by download
     #               (Boolean) For download video use. Can download lastest video first.
     #
-    def main(self, uid, d_type='photo', is_new_first=True):
-        photo_list, video_urls = self._get_url_context(uid, is_new_first)
-
+    def main(self, uid, d_type='photo'):
         # Create folder
         if not os.path.isdir(uid):
             os.mkdir(uid)
 
-        status = 0
-        # photo
-        if d_type == 'photo':
-            pass
-            # status = self.p_downloader.get_pic(uid, photo_list)
+        video_path = '{}{}video'.format(uid, os.sep)
+        if not os.path.isdir(video_path):
+            os.mkdir(video_path)
+        pic_path = '{}{}photo'.format(uid, os.sep)
+        if not os.path.isdir(pic_path):
+            os.mkdir(pic_path)
+        ###-
 
-        # video
-        if d_type == 'video':
-            pass
-            # urllib.urlretrieve(video_url, filename, self._report_hook)
-            # status = self.v_downloader.get_video(uid, video_urls)
-
-
-        self.p_downloader.stop_download = False
-        self.v_downloader.stop_download = False
-        if status == 1:
+        try:
+            self._get_url_context(uid, d_type)
             return '========== Success =========='
-
-        return 'Connection fail'
+        except:
+            return 'Connection fail'
 
 ### Unit test ###
 if __name__ == '__main__':
     my_tester = GplusVideoCrawler()
     #uid = '110216234612751595989'
     #uid = '105835152133357364264'
-    print(my_tester.main('108862052279750773861', 'video', False))
+    print(my_tester.main('115975634910643785199', 'video', False))
