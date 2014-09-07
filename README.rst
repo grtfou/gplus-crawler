@@ -11,11 +11,11 @@ Introduction
 
 Requirements
 ============
-  + Python 2.7
+  + Python == 2.7
 
-  + lxml
+  + lxml >= 3.0
 
-  + wxPython (For UI)
+  + wxPython >= 2.9.4  (For UI)
 
 
 About How to Use
