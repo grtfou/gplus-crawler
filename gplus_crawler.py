@@ -132,7 +132,7 @@ class GplusVideoCrawler(object):
                         video_url = video_list.group(1).replace('\u003d', '=').replace('\u0026', '&')
                         print(filename)
                         filename = '{0}{1}video{1}{2}'.format(uid, os.sep, filename)
-                        # urllib.urlretrieve(video_url, filename, self._report_hook)
+                        urllib.urlretrieve(video_url, filename, self._report_hook)
                         video_list = ""
                         date_list = ""
                         print("\n")
@@ -155,7 +155,7 @@ class GplusVideoCrawler(object):
 
                         filename = '{0}{1}photo{1}{2}'.format(uid, os.sep, filename)
                         photo_url = new_photo.group(2)
-                        # urllib.urlretrieve(photo_url, filename + ".jpg", self._report_hook)
+                        urllib.urlretrieve(photo_url, filename + ".jpg", self._report_hook)
                         print("\n")
             ###-
 
