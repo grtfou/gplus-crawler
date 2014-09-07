@@ -13,8 +13,6 @@ Requirements
 ============
   + Python == 2.7
 
-  + lxml >= 3.0
-
   + wxPython >= 2.9.4  (For UI)
 
 
