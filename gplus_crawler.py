@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #  @first_date    20130414
-#  @date          20140907
-#  @version       1.3 (20131002) - New method for download fast
-#                 1.2 - Redesigned web crawler for more performance
-#                 1.0 - Implemented for new G+ format (20130530)
+#  @date          20140908 - added logging
+#  @version       0.4 - Redesign
+#                 0.3 (20131002) - New method for download fast
+#                 0.2 - Redesigned web crawler for more performance
+#                 0.1 - Implemented for new G+ format (20130530)
 #  @brief         Main function
 
 import urllib
@@ -13,19 +14,14 @@ import contextlib
 import os
 import re
 import sys
-from collections import OrderedDict
+import logging
 
-# from video_crawler import VideoCrawler
-# from pic_crawler import PicCrawler
+logging.basicConfig(level=logging.DEBUG, filename='debug.log')
 
 class GplusVideoCrawler(object):
     stop_download = False
-    # p_downloader = PicCrawler()
-    # v_downloader = VideoCrawler()
 
     def __init__(self):
-        # inside quote is video key. Outside quote is photo url
-
         ### video regex ###
         # (url: http://redirector.googlevideo.com/videoplayback?id)
         # g+ source code
@@ -66,8 +62,6 @@ class GplusVideoCrawler(object):
                 'soc-app': '2',
                 'soc-platform': '1',
                 'f.req': ('[["posts",null,null,"synthetic:posts:{0}",3,"{0}",null],[1500,1,null],""]'.format(uid))
-                   # 沒有 KQryPrNyAAAAMWJDNePFPcZROABBIfsNccU9xlFNAACAP1CUqBtaLXNoYTE6NDE5MmQ2NDVjZTU2NGI5MzZiMTg5ZGUzN2MzYzg5Nzg0NDgzYmI1OYgB55OF8_YnqQHFPcZRAAAAALEBOMMGAAAAAAC6AQd1cGRhdGVz
-                   # 也能抓，不過只有最一開始的那一頁
         }
         req = urllib2.Request(
                 url = url,
@@ -90,11 +84,9 @@ class GplusVideoCrawler(object):
         sys.stdout.flush()
 
     ##
-    #  @brief       Get urls by raw of html page
+    #  @brief       Get urls by raw html and download
     #  @param       (String) uid
-    #               (Boolean) For download video use. Can download lastest video first.
-    #  @return      (Tuple) photo list
-    #               (OrderedDict) video list
+    #               (String) download photo or video
     #
     def _get_url_context(self, uid, d_type):
         page_req = self._get_raw_page(uid)
@@ -163,8 +155,8 @@ class GplusVideoCrawler(object):
     ##
     #  @brief       Main function
     #  @param       (Integer) user id
-    #               (String) photo / video by download
-    #               (Boolean) For download video use. Can download lastest video first.
+    #               (String) photo / video
+    #  @return      (String) program status
     #
     def main(self, uid, d_type='photo'):
         # Create folder
@@ -183,11 +175,10 @@ class GplusVideoCrawler(object):
             self._get_url_context(uid, d_type)
             return '========== Success =========='
         except:
+            logging.exception("Oh My God:{}, {}".format(str(uid), d_type))
             return 'Connection fail'
 
 ### Unit test ###
 if __name__ == '__main__':
     my_tester = GplusVideoCrawler()
-    #uid = '110216234612751595989'
-    #uid = '105835152133357364264'
     print(my_tester.main('115975634910643785199', 'video', False))
