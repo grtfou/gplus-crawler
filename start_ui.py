@@ -98,10 +98,7 @@ class MainWindow(wx.Frame):
         worker.start()
 
     def StopDownload(self, event):
-        try:
-            self.my_exe.stop_download = True
-        except:
-            pass
+        self.my_exe.stop_download = True
 
     # def OnCalSelected(self, event):
         # self.start_date = event.PyGetDate()
