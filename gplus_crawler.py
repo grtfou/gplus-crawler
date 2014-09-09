@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 #  @first_date    20130414
 #  @date          20140908 - added logging
-#  @version       0.4 - Redesign
-#                 0.3 (20131002) - New method for download fast
-#                 0.2 - Redesigned web crawler for more performance
-#                 0.1 - Implemented for new G+ format (20130530)
+#  @version       0.4 (140907)- Redesign
+#                 0.3 (131002) - New method for download fast
+#                 0.2 (130530) - Redesigned web crawler for more performance
+#                 0.1 (130506) - Implemented for new G+ format
 #  @brief         Main function
 
 import urllib
@@ -16,6 +16,16 @@ import re
 import sys
 import logging
 
+''' Test debug code
+import ssl
+import httplib
+from functools import partial
+class fake_ssl:
+    wrap_socket = partial(ssl.wrap_socket, ssl_version=ssl.PROTOCOL_SSLv3)
+
+httplib.ssl = fake_ssl
+'''
+
 logging.basicConfig(level=logging.DEBUG, filename='debug.log')
 
 class GplusVideoCrawler(object):
@@ -25,18 +35,15 @@ class GplusVideoCrawler(object):
         ### video regex ###
         # (url: http://redirector.googlevideo.com/videoplayback?id)
         # g+ source code
-        # regx_txt = ur"^,\[&quot;.*(http[s]{0,1}:\/\/redirector.googlevideo.com\/videoplayback.*)\]$"
-        regx_txt = ur".*(https://redirector.googlevideo.com.*)\"\]$"
+        regx_txt = r".*(https://redirector\.googlevideo\.com.*)\"\]$"
         self.video_regx = re.compile(regx_txt)
 
-        # regx_txt = r".*,\[1,\"http.*\/([0-9_]+).mp4"
-        regx_txt = ur".*(20[0-9]{1}[0-9]{1}/[0-1][0-9]/[0-3][0-9]).*"
+        regx_txt = r".*(20[0-9]{1}[0-9]{1}/[0-1][0-9]/[0-3][0-9]).*"
         self.date_regx = re.compile(regx_txt)
 
         ### photo regex ###
         # old regex
-        # regx_txt = ur",.*\[\"https:\/\/picasaweb.*\/(.*)#.*\[\"(.*)\""
-        regx_txt = ur"^,.*https://picasaweb.google.com/[0-9]*/([0-9]*)#.*\[\"(http[s]{0,1}:\/\/.*)\".*\]$"
+        regx_txt = r"^,.*https://picasaweb.google.com/[0-9]*/([0-9]*)#.*\[\"(https://.*)\".*\]$"
         self.photo_regx = re.compile(regx_txt)
 
     ##
@@ -83,6 +90,10 @@ class GplusVideoCrawler(object):
         sys.stdout.write("\r%2d%%" % percent)
         sys.stdout.flush()
 
+    def _download(self, url, filename):
+        urllib.urlretrieve(url, filename, self._report_hook)
+
+
     ##
     #  @brief       Get urls by raw html and download
     #  @param       (String) uid
@@ -121,7 +132,9 @@ class GplusVideoCrawler(object):
                         video_url = video_list.group(1).replace('\u003d', '=').replace('\u0026', '&')
                         print(filename)
                         filename = '{0}{1}video{1}{2}'.format(uid, os.sep, filename)
-                        urllib.urlretrieve(video_url, filename, self._report_hook)
+
+                        self._download(video_url, filename)
+
                         video_list = ""
                         date_list = ""
                         print("\n")
@@ -144,7 +157,9 @@ class GplusVideoCrawler(object):
 
                         filename = '{0}{1}photo{1}{2}'.format(uid, os.sep, filename)
                         photo_url = new_photo.group(2)
-                        urllib.urlretrieve(photo_url, filename + ".jpg", self._report_hook)
+                        # urllib.urlretrieve(photo_url, filename + ".jpg", self._report_hook)
+                        self._download(photo_url, filename + ".jpg")
+
                         print("\n")
             ###-
 
@@ -181,4 +196,4 @@ class GplusVideoCrawler(object):
 ### Unit test ###
 if __name__ == '__main__':
     my_tester = GplusVideoCrawler()
-    print(my_tester.main('115975634910643785199', 'video', False))
+    print(my_tester.main('115975634910643785199', 'video'))
