@@ -31,18 +31,18 @@ About How to Use
 
 Change log
 ===========
-* `0.4`_ (2014-09-08)
+* ``0.4.0`` (2014-09-08)
     * Added: Video date
     * Fixed: Regex bugs
     * Enhanced: Refactored system structure for download efficiency
-    * Enhanced: Integrated Video and Pictures crawlers.
-* `0.3`_ (2013-05-30)
-    * Fixed: Full crawl fail (Only 1000 messages).
+    * Enhanced: Integrated Video and Pictures crawlers
+* ``0.3.0`` (2013-05-30)
+    * Fixed: Full crawl fail (Only 1000 messages)
     * Fixed: Refactored system for Google+ change design
-* `0.2.4`_ (2013-05-16)
+* ``0.2.4`` (2013-05-16)
     * Implemented: Videos full crawler from G+ message
     * Enhanced: Download efficiency
-* `0.1`_ (2013-04-05)
+* ``0.1.0`` (2013-04-05)
     * Implemented: Pictures full crawler from G+ message
 
 Licence
