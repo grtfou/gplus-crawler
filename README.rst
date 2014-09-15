@@ -1,12 +1,12 @@
 gplus_crawler
 =============
 
-README Last Updated on 2014.09.07
+README Last Updated on 2014.09.15
 
 Introduction
 ============
 
-備份 Google Plus (Google+) ``訊息裡的圖片(Picture)`` and ``影片 (Video)``
+Download and backup Google Plus (Google+) ``Pictures`` or ``Videos`` in messages
 
 
 Requirements
@@ -35,8 +35,6 @@ About How to Use
 P.S.
 =====
 
-  * Just backup (download) pictures and videos in the message
-
-  * If file name exists, it will skip that picture.
+  * Just backup (download) pictures and videos in messages
 
   * The best video quality
