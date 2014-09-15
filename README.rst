@@ -37,12 +37,12 @@ Change log
     * Enhanced: Refactored system structure for download efficiency
     * Enhanced: Integrated Video and Pictures crawlers
 * ``0.3.0`` (2013-05-30)
-    * Fixed: Full crawl fail (Only 1000 messages)
-    * Fixed: Refactored system for Google+ change design
+    * Fixed: Full crawl fail (Only 1000 messages) by G+ new design
+    * Fixed: Refactored system for Google+ change new design
 * ``0.2.4`` (2013-05-16)
     * Implemented: Videos full crawler from G+ message
     * Enhanced: Download efficiency
-* ``0.1.0`` (2013-04-05)
+* ``0.1.0`` (2013-03-23)
     * Implemented: Pictures full crawler from G+ message
 
 Licence

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #  @first_date    20130414
-#  @date          20140908 - added logging
+#  @date          20140916 - Fixing naming typo
 #  @version       0.4 (140907)- Redesign
 #                 0.3 (131002) - New method for download fast
 #                 0.2 (130530) - Redesigned web crawler for more performance
@@ -28,7 +28,7 @@ httplib.ssl = fake_ssl
 
 logging.basicConfig(level=logging.DEBUG, filename='debug.log')
 
-class GplusVideoCrawler(object):
+class GplusCrawler(object):
     stop_download = False
 
     def __init__(self):
@@ -190,10 +190,5 @@ class GplusVideoCrawler(object):
             self._get_url_context(uid, d_type)
             return '========== Success =========='
         except:
-            logging.exception("Oh My God:{}, {}".format(str(uid), d_type))
-            return 'Connection fail'
-
-### Unit test ###
-if __name__ == '__main__':
-    my_tester = GplusVideoCrawler()
-    print(my_tester.main('115975634910643785199', 'video'))
+            logging.exception("Error !! Error:{}, {}".format(str(uid), d_type))
+            return 'Connection Fail'
