@@ -13,7 +13,7 @@ Requirements
 ============
   + Python == 2.7
 
-  + wxPython >= 2.9.4  (For UI)
+  + wxPython \>= 2.9.4  (For UI)
 
 
 About How to Use
