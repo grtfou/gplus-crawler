@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #  @first_date    20130414
-#  @date          20140916 - Fixing naming typo
-#  @version       0.4 (140907)- Redesign
-#                 0.3 (131002) - New method for download fast
-#                 0.2 (130530) - Redesigned web crawler for more performance
-#                 0.1 (130506) - Implemented for new G+ format
-#  @brief         Main function
+#  @date          20141108 - import Requests for fixing ssl bug issue.
+'''
+Download photo or videos from google plus
+'''
 
 import urllib
 import urllib2
@@ -15,6 +13,7 @@ import os
 import re
 import sys
 import logging
+import requests
 
 ''' Test debug code
 import ssl
@@ -91,7 +90,14 @@ class GplusCrawler(object):
         sys.stdout.flush()
 
     def _download(self, url, filename):
-        urllib.urlretrieve(url, filename, self._report_hook)
+        # urllib.urlretrieve(url, filename, self._report_hook)
+        r = requests.get(url, stream=True)
+        if r.status_code == 200:
+            with open(filename, 'wb') as o_file:
+                for chunk in r.iter_content(1024):
+                    o_file.write(chunk)
+        else:
+            print('Visit website fail')
 
 
     ##
