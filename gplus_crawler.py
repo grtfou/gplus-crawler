@@ -5,15 +5,15 @@
 '''
 Download photo or videos from google plus
 '''
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
 
-import urllib
-import urllib2
-import contextlib
+import requests
 import os
 import re
 import sys
 import logging
-import requests
 
 ''' Test debug code
 import ssl
@@ -51,31 +51,37 @@ class GplusCrawler(object):
     #  @return      (Object) network request
     #
     def _get_raw_page(self, uid):
-        url = 'https://plus.google.com/u/0/photos/{0}/albums/posts'.format(uid)
-        url = 'https://plus.google.com/u/0/_/photos/pc/read/?soc-app=2'
+        url = 'https://plus.google.com/u/0/_/photos/pc/read/'
 
         headers = {
-         'User-Agent':'Mozilla/5.0 (Windows NT 6.1) Gecko/20091201 Firefox/3.5.6 Chrome/16.0.912.77 Safari/535.7'
+         'User-Agent':'Mozilla/5.0 (Windows NT 6.1) Gecko/20091201 '
+                      'Firefox/3.5.6 Chrome/16.0.912.77 Safari/535.7'
         }
 
         url_param = {
-                '_reqid': '',
-                'avw': 'phst:31',
-                'cid': '0',
-                'f.sid': '',
-                'ozv': 'es_oz_20130915.11_p1',
-                'rt': 'j',
-                'soc-app': '2',
-                'soc-platform': '1',
-                'f.req': ('[["posts",null,null,"synthetic:posts:{0}",3,"{0}",null],[1500,1,null],""]'.format(uid))
+            '_reqid': '',
+            'avw': 'phst:31',
+            'cid': '0',
+            'f.sid': '',
+            'ozv': 'es_oz_20130915.11_p1',
+            'rt': 'j',
+            'soc-app': '2',
+            'soc-platform': '1',
+            'f.req': ('[["posts",null,null,"synthetic:posts:{0}"'
+                      ',3,"{0}",null],[1500,1,null],""]'.format(uid))
         }
-        req = urllib2.Request(
-                url = url,
-                data = urllib.urlencode(url_param),
-                headers = headers
-        )
+        # req = urllib2.Request(
+        #         url = url,
+        #         data = urllib.urlencode(url_param),
+        #         headers = headers
+        # return req
 
-        return req
+        session = requests.Session()
+        req = session.post(url, data=url_param, headers=headers, verify=True)
+
+        if req.status_code == 200:
+            return req.content
+        return ""
 
     ##
     #  @brief       For video download have download progress bar
@@ -83,22 +89,34 @@ class GplusCrawler(object):
     #               (Integer) size of block
     #               (Integer) total size
     #
-    def _report_hook(self, blocknum, blocksize, totalsize):
-        percent = 100.0 * blocknum * blocksize / totalsize
-        if percent > 100: percent = 100
-        sys.stdout.write("\r%2d%%" % percent)
-        sys.stdout.flush()
+    # def _report_hook(self, blocknum, blocksize, totalsize):
+    #     percent = 100.0 * blocknum * blocksize / totalsize
+    #     if percent > 100: percent = 100
+    #     sys.stdout.write("\r%2d%%" % percent)
+    #     sys.stdout.flush()
 
     def _download(self, url, filename):
+        '''
+        Download photo/video to file
+        '''
         # urllib.urlretrieve(url, filename, self._report_hook)
-        r = requests.get(url, stream=True)
-        if r.status_code == 200:
+
+        req = requests.get(url, stream=True)
+        if req.status_code == 200:
+            total_length = req.headers.get('content-length')
+            dl_progress = 0
+
             with open(filename, 'wb') as o_file:
-                for chunk in r.iter_content(1024):
+                for chunk in req.iter_content(1024):
+                    dl_progress += len(chunk)
                     o_file.write(chunk)
+
+                    # Download progress report
+                    percent = 100.0 * dl_progress / int(total_length)
+                    sys.stdout.write("\r%2d%%" % percent)
+                    sys.stdout.flush()
         else:
             print('Visit website fail')
-
 
     ##
     #  @brief       Get urls by raw html and download
@@ -106,72 +124,72 @@ class GplusCrawler(object):
     #               (String) download photo or video
     #
     def _get_url_context(self, uid, d_type):
-        page_req = self._get_raw_page(uid)
+        web_page = self._get_raw_page(uid)
 
-        with contextlib.closing(urllib2.urlopen(page_req)) as web_page:
-            if web_page.getcode() != 200:
-                web_page.close()
-                return None, None
+        # with contextlib.closing(urllib2.urlopen(page_req)) as web_page:
+        #     if web_page.getcode() != 200:
+        #         web_page.close()
+        #         return None, None
 
-            date_list = ""
-            video_list = ""
-            count = 1
-            old_filename = ""
+        date_list = ""
+        video_list = ""
+        count = 1
+        old_filename = ""
 
-            for line in web_page:
-                line = line.strip()
+        for line in web_page.split(b'\n'):
+            line = line.strip()
 
-                ### photo or video ###
-                if d_type == "video":
-                    new_video = self.video_regx.match(line)
-                    new_date = self.date_regx.match(line)
+            ### photo or video ###
+            if d_type == "video":
+                new_video = self.video_regx.match(line)
+                new_date = self.date_regx.match(line)
 
-                    if new_video:
-                        video_list = new_video
+                if new_video:
+                    video_list = new_video
 
-                    if new_date:
-                        date_list = new_date
+                if new_date:
+                    date_list = new_date
 
 
-                    if date_list and video_list and line == ']':
-                        filename = date_list.group(1).replace('/','-') + ".mp4"
-                        video_url = video_list.group(1).replace('\u003d', '=').replace('\u0026', '&')
-                        print(filename)
-                        filename = '{0}{1}video{1}{2}'.format(uid, os.sep, filename)
+                if date_list and video_list and line == ']':
+                    filename = date_list.group(1).replace('/','-') + ".mp4"
+                    video_url = video_list.group(1).replace('\u003d', '=').replace('\u0026', '&')
+                    print(filename)
+                    filename = '{0}{1}video{1}{2}'.format(uid, os.sep, filename)
 
-                        self._download(video_url, filename)
+                    self._download(video_url, filename)
 
-                        video_list = ""
-                        date_list = ""
-                        print("\n")
-                elif d_type == "photo":
-                    new_photo = self.photo_regx.match(line)
-                    if new_photo:
-                        filename = ""
-                        if len(new_photo.group(1)) > 8:
-                            filename = new_photo.group(1)[:8] + "-" + new_photo.group(1)[8:]
-                        else:
-                            filename = new_photo.group(1)
+                    video_list = ""
+                    date_list = ""
+                    print("\n")
+            elif d_type == "photo":
+                new_photo = self.photo_regx.match(line)
+                if new_photo:
+                    filename = ""
+                    if len(new_photo.group(1)) > 8:
+                        filename = new_photo.group(1)[:8] + "-" + new_photo.group(1)[8:]
+                    else:
+                        filename = new_photo.group(1)
 
-                        print(filename)
-                        if filename == old_filename:
-                            filename += "_{}".format(count)
-                            count += 1
-                        else:
-                            count = 1
-                            old_filename = filename
+                    print(filename)
+                    if filename == old_filename:
+                        filename += "_{}".format(count)
+                        count += 1
+                    else:
+                        count = 1
+                        old_filename = filename
 
-                        filename = '{0}{1}photo{1}{2}'.format(uid, os.sep, filename)
-                        photo_url = new_photo.group(2)
-                        # urllib.urlretrieve(photo_url, filename + ".jpg", self._report_hook)
-                        self._download(photo_url, filename + ".jpg")
+                    filename = '{0}{1}photo{1}{2}'.format(uid, os.sep, filename)
+                    photo_url = new_photo.group(2)
+                    # urllib.urlretrieve(photo_url, filename + ".jpg", self._report_hook)
+                    self._download(photo_url, "{}.jpg".format(filename))
 
-                        print("\n")
-            ###-
+                    print("\n")
+        ###-
 
-                if self.stop_download:
-                    self.stop_download = False
-                    break
+            if self.stop_download:
+                self.stop_download = False
+                break
 
     ##
     #  @brief       Main function
