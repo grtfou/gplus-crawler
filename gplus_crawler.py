@@ -5,7 +5,7 @@
 '''
 Download photo or videos from google plus
 '''
-from __future__ import unicode_literals
+# from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
 
@@ -28,6 +28,10 @@ httplib.ssl = fake_ssl
 logging.basicConfig(level=logging.DEBUG, filename='debug.log')
 
 class GplusCrawler(object):
+    '''
+    Main class
+    '''
+
     stop_download = False
 
     def __init__(self):
@@ -45,12 +49,17 @@ class GplusCrawler(object):
         regx_txt = r"^,.*https://picasaweb.google.com/[0-9]*/([0-9]*)#.*\[\"(https://.*)\".*\]$"
         self.photo_regx = re.compile(regx_txt)
 
-    ##
-    #  @brief       Arrage request for get raw html page
-    #  @param       (String) uid
-    #  @return      (Object) network request
-    #
     def _get_raw_page(self, uid):
+        '''
+        Arrage request for get raw html page
+
+        Args:
+            (String) user id
+
+        Return:
+            (String) web page content
+        '''
+
         url = 'https://plus.google.com/u/0/_/photos/pc/read/'
 
         headers = {
@@ -98,6 +107,10 @@ class GplusCrawler(object):
     def _download(self, url, filename):
         '''
         Download photo/video to file
+
+        Args:
+            (String) url
+            (String) file name (output)
         '''
         # urllib.urlretrieve(url, filename, self._report_hook)
 
@@ -118,12 +131,15 @@ class GplusCrawler(object):
         else:
             print('Visit website fail')
 
-    ##
-    #  @brief       Get urls by raw html and download
-    #  @param       (String) uid
-    #               (String) download photo or video
-    #
     def _get_url_context(self, uid, d_type):
+        '''
+        Get urls by raw html and download
+
+        Args:
+            (String) user id
+            (String) download photo/video to file
+        '''
+
         web_page = self._get_raw_page(uid)
 
         # with contextlib.closing(urllib2.urlopen(page_req)) as web_page:
@@ -136,7 +152,7 @@ class GplusCrawler(object):
         count = 1
         old_filename = ""
 
-        for line in web_page.split(b'\n'):
+        for line in web_page.split('\n'):
             line = line.strip()
 
             ### photo or video ###
@@ -191,13 +207,18 @@ class GplusCrawler(object):
                 self.stop_download = False
                 break
 
-    ##
-    #  @brief       Main function
-    #  @param       (Integer) user id
-    #               (String) photo / video
-    #  @return      (String) program status
-    #
     def main(self, uid, d_type='photo'):
+        '''
+        Main function
+
+        Args:
+            (Integer) user id by google plus
+            (String) photo / video
+
+        Return:
+            (String) execution status
+        '''
+
         # Create folder
         if not os.path.isdir(uid):
             os.mkdir(uid)
