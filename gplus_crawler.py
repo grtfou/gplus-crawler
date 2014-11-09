@@ -5,7 +5,7 @@
 '''
 Download photo or videos from google plus
 '''
-# from __future__ import unicode_literals
+from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
 
@@ -45,9 +45,11 @@ class GplusCrawler(object):
         self.date_regx = re.compile(regx_txt)
 
         ### photo regex ###
-        # old regex
         regx_txt = r"^,.*https://picasaweb.google.com/[0-9]*/([0-9]*)#.*\[\"(https://.*)\".*\]$"
         self.photo_regx = re.compile(regx_txt)
+
+        # session
+        self.session = requests.session()
 
     def _get_raw_page(self, uid):
         '''
@@ -85,11 +87,11 @@ class GplusCrawler(object):
         #         headers = headers
         # return req
 
-        session = requests.Session()
-        req = session.post(url, data=url_param, headers=headers, verify=True)
+        req = self.session.post(url, data=url_param,
+                                headers=headers, verify=True)
 
         if req.status_code == 200:
-            return req.content
+            return req.content.decode('utf-8')
         return ""
 
     ##
@@ -114,7 +116,7 @@ class GplusCrawler(object):
         '''
         # urllib.urlretrieve(url, filename, self._report_hook)
 
-        req = requests.get(url, stream=True)
+        req = self.session.get(url, stream=True)
         if req.status_code == 200:
             total_length = req.headers.get('content-length')
             dl_progress = 0
@@ -168,8 +170,8 @@ class GplusCrawler(object):
 
 
                 if date_list and video_list and line == ']':
-                    filename = date_list.group(1).replace('/','-') + ".mp4"
-                    video_url = video_list.group(1).replace('\u003d', '=').replace('\u0026', '&')
+                    filename = "{}.mp4".format(date_list.group(1).replace('/', '-'))
+                    video_url = video_list.group(1).replace(b'\u003d', b'=').replace(b'\u0026', b'&')
                     print(filename)
                     filename = '{0}{1}video{1}{2}'.format(uid, os.sep, filename)
 
@@ -178,12 +180,14 @@ class GplusCrawler(object):
                     video_list = ""
                     date_list = ""
                     print("\n")
+
             elif d_type == "photo":
                 new_photo = self.photo_regx.match(line)
                 if new_photo:
                     filename = ""
                     if len(new_photo.group(1)) > 8:
-                        filename = new_photo.group(1)[:8] + "-" + new_photo.group(1)[8:]
+                        filename = "{}-{}".format(new_photo.group(1)[:8],
+                                                  new_photo.group(1)[8:])
                     else:
                         filename = new_photo.group(1)
 
