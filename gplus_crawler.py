@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #  @first_date    20130414
-#  @date          20141108 - import Requests for fixing ssl bug issue.
+#  @date          20141117 - Add: Close session
 '''
 Download photo or videos from google plus
 '''
@@ -57,7 +57,8 @@ class GplusCrawler(object):
 
         headers = {
          'User-Agent':'Mozilla/5.0 (Windows NT 6.1) Gecko/20091201 '
-                      'Firefox/3.5.6 Chrome/16.0.912.77 Safari/535.7'
+                      'Firefox/3.5.6 Chrome/16.0.912.77 Safari/535.7',
+         'Connection':'close',
         }
 
         url_param = {

@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #  @first_date    20140916
-#  @date
-#  @version       0.1 (140916)
+#  @date          20141117 - Edit to unit test format
 '''
 Test main function for download image
 '''
@@ -15,7 +14,7 @@ from gplus_crawler import GplusCrawler
 class TestMainFunction(unittest.TestCase):
     def setUp(self):
         self.user_id = '115975634910643785199'
-        self.d_type = 'video'
+        self.d_type = 'photo'
 
     def tearDown(self):
         self.user_id = None
@@ -26,7 +25,7 @@ class TestMainFunction(unittest.TestCase):
         if self.d_type in ('video', 'photo'):
             result = main_program.main(self.user_id, self.d_type)
 
-        self.assertEqual(result, 'Connection Fail')
+        self.assertNotEqual(result, 'Connection Fail')
 
 if __name__ == '__main__':
     unittest.main()
