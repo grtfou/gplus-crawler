@@ -6,7 +6,7 @@
 #  @brief         Test crawler main function
 
 import sys
-# sys.path.append('..')
+sys.path.append('..')
 
 from gplus_crawler import GplusCrawler
 
