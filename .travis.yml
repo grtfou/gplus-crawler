@@ -1,4 +1,5 @@
 language: python
+
 python:
   - "2.6"
   - "2.7"
@@ -6,7 +7,12 @@ python:
 # command to install dependencies
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq python-wxgtk2.8
+  - wget http://downloads.sourceforge.net/wxpython/wxPython-src-3.0.1.1.tar.bz2
+  - tar zxvf wxPython-src-3.0.1.1.tar.bz2
+  - cd wxPython-src-3.0.1.1
+  - python setup.py build
+  - sudo python setup.py install
+  - cd ..
 # command to install dependencies
 install:
   - "pip install -r requirements.txt"
