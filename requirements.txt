@@ -1,2 +1,2 @@
 requests==2.4.3
-cx_Freezee==4.3.3
+cx_Freeze==4.3.3
