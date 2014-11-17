@@ -17,6 +17,7 @@ Requirements
 + Python == 2.7
 + wxPython >= 2.9.4  (For UI)
 + requests == 2.4.3
++ cx_Freeze == 4.3.3
 
 
 About How to Use
