@@ -9,21 +9,12 @@ from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
 
-import requests
 import os
 import re
 import sys
 import logging
 
-''' Test debug code
-import ssl
-import httplib
-from functools import partial
-class fake_ssl:
-    wrap_socket = partial(ssl.wrap_socket, ssl_version=ssl.PROTOCOL_SSLv3)
-
-httplib.ssl = fake_ssl
-'''
+import requests
 
 logging.basicConfig(level=logging.DEBUG, filename='debug.log')
 
