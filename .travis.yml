@@ -8,7 +8,7 @@ python:
 before_install:
   - sudo apt-get update -qq
   - wget http://downloads.sourceforge.net/wxpython/wxPython-src-3.0.1.1.tar.bz2
-  - tar zxvf wxPython-src-3.0.1.1.tar.bz2
+  - tar -xf wxPython-src-3.0.1.1.tar.bz2
   - cd wxPython-src-3.0.1.1
   - python setup.py build
   - sudo python setup.py install
