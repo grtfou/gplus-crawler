@@ -1,28 +1,26 @@
-gplus_crawler
-=============
+GPlus Crawler
+==============
 
-README Last Updated on 2014.11.09
+README Last Updated on 2014.11.17
 
 Introduction
-============
+=============
+Download Google Plus (Google+) ``Pictures`` and ``Videos`` in messages
 
-Download and backup Google Plus (Google+) ``Pictures`` or ``Videos`` in messages
-
-* Just backup (download) pictures and videos in messages
+* For backup (download) pictures and videos in messages
 * The best video quality
 
-Requirements
-============
 
+Requirements
+=============
 + Python == 2.7
 + wxPython >= 2.9.4  (For UI)
 + requests == 2.4.3
-+ cx_Freeze == 4.3.3
++ cx_Freeze == 4.3.3 (For compile to .exe file)
 
 
-About How to Use
+How to Use
 ==================
-
 * Download it (portable)
     * https://code.google.com/p/gplus-crawler/downloads/list
 * Uncompress and execute ``start_ui.exe`` to run
@@ -31,8 +29,12 @@ About How to Use
 * Press ``Go Download!`` button
 * If yout want to ``Stop``, press ``Stop`` button
 
+
 Change log
 ===========
+* ``0.4.1`` (2014-11-17)
+    * Fixed: connection alive issue
+    * Fixed: Service refusing SSLv2 connection
 * ``0.4.0`` (2014-09-08)
     * Added: Video date
     * Fixed: Regex bugs
