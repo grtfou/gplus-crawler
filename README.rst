@@ -1,5 +1,5 @@
-GPlus Crawler
-==============
+Google Plus Image/Video Crawler
+===============================
 
 README Last Updated on 2014.11.17
 
