@@ -10,7 +10,7 @@ import threading
 import wx
 
 import configure as conf
-from gplus_crawler import GplusVideoCrawler
+from gplus_crawler import GplusCrawler
 
 class CountingThread(threading.Thread):
     def __init__(self, crawler, picasa_id, d_type):
@@ -82,7 +82,7 @@ class MainWindow(wx.Frame):
         self.OnClick(event)
 
     def OnClick(self, event):
-        self.my_exe = GplusVideoCrawler()
+        self.my_exe = GplusCrawler()
         worker = CountingThread(self.my_exe, self.picasa_id.Value, self.d_type) # self.new_first.GetValue()
         worker.start()
 
