@@ -1,7 +1,7 @@
 Google Plus Image/Video Crawler
 ===============================
 
-README Last Updated on 2014.11.17
+README Last Updated on 2014.12.17
 
 Introduction
 =============
