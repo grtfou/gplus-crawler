@@ -17,6 +17,8 @@ import logging
 import requests
 
 logging.basicConfig(level=logging.DEBUG, filename='debug.log')
+CA_PATH = 'cacert.pem'
+logging.exception("Error !! Error:{}".format(CA_PATH))
 
 class GplusCrawler(object):
     '''
@@ -80,7 +82,7 @@ class GplusCrawler(object):
         # return req
 
         req = self.session.post(url, data=url_param,
-                                headers=headers, verify=True)
+                                headers=headers, verify=CA_PATH)
 
         if req.status_code == 200:
             return req.content.decode('utf-8')
@@ -108,7 +110,7 @@ class GplusCrawler(object):
         '''
         # urllib.urlretrieve(url, filename, self._report_hook)
 
-        req = self.session.get(url, stream=True)
+        req = self.session.get(url, stream=True, verify=CA_PATH)
         if req.status_code == 200:
             total_length = req.headers.get('content-length')
             dl_progress = 0
