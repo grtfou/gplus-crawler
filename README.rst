@@ -58,4 +58,5 @@ Licence
 ========
 MIT License
 
-.. |build| image:: https://travis-ci.org/grtfou/gplus-crawler.svg?branch=master)](https://travis-ci.org/grtfou/gplus-crawler)
+.. |build| image:: https://travis-ci.org/grtfou/gplus-crawler.svg?branch=master
+    :target: https://travis-ci.org/grtfou/gplus-crawler
