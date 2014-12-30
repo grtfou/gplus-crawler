@@ -1,14 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #  @first_date    20140916
-#  @date          20141117 - Edit to unit test format
-'''
+#  @date          20141230 - Added tearDown function
+"""
 Test main function for download image
-'''
+"""
 
 import unittest
-import sys, os
+import sys
+import os
+import shutil
+
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from gplus_crawler import GplusCrawler
 
 class TestMainFunction(unittest.TestCase):
@@ -16,7 +20,8 @@ class TestMainFunction(unittest.TestCase):
         self.user_id = '115975634910643785199'
 
     def tearDown(self):
-        self.user_id = None
+        if os.path.exists(self.user_id):
+            shutil.rmtree(self.user_id)
 
     def test_video(self):
         main_program = GplusCrawler()

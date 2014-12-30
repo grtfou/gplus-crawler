@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #  @first_date    20130414
-#  @date          20141230 - Fix: Certification on HTTPS connection
+#  @date          20141230 - Fix: Certification on HTTPS connection and support py3
 """
 Download photo or videos from google plus
 """
 
 from __future__ import unicode_literals
 from __future__ import print_function
-from __future__ import division
 
 import os
 import re
@@ -173,7 +172,9 @@ class GplusCrawler(object):
 
                 if date_list and video_list and line == ']':
                     filename = "{}.mp4".format(date_list.group(1).replace('/', '-'))
-                    video_url = video_list.group(1).replace(b'\u003d', b'=').replace(b'\u0026', b'&')
+                    video_url = (video_list.group(1).encode('utf-8')
+                                 .replace(b'\u003d', b'=').replace(b'\u0026', b'&'))
+
                     print(filename)
                     filename = '{0}{1}video{1}{2}'.format(uid, os.sep, filename)
 
