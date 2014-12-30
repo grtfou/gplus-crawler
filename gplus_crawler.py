@@ -20,10 +20,15 @@ import requests
 logging.basicConfig(level=logging.DEBUG, filename='debug.log')
 CA_PATH = 'cacert.pem'
 
+# For Dev or Debug/Testing when can't find cacert.pem
+if not os.path.exists(CA_PATH):
+    from distutils.sysconfig import get_python_lib
+    CA_PATH = os.sep.join([get_python_lib(), 'requests', CA_PATH])
+
 class GplusCrawler(object):
-    '''
+    """
     Main class
-    '''
+    """
 
     stop_download = False
 
@@ -45,7 +50,7 @@ class GplusCrawler(object):
         self.session = requests.session()
 
     def _get_raw_page(self, uid):
-        '''
+        """
         Arrage request for get raw html page
 
         Args:
@@ -53,7 +58,8 @@ class GplusCrawler(object):
 
         Return:
             (String) web page content
-        '''
+
+        """
 
         url = 'https://plus.google.com/u/0/_/photos/pc/read/'
 
@@ -101,13 +107,14 @@ class GplusCrawler(object):
     #     sys.stdout.flush()
 
     def _download(self, url, filename):
-        '''
+        """
         Download photo/video to file
 
         Args:
             (String) url
             (String) file name (output)
-        '''
+
+        """
         # urllib.urlretrieve(url, filename, self._report_hook)
 
         req = self.session.get(url, stream=True, verify=CA_PATH)
@@ -128,13 +135,14 @@ class GplusCrawler(object):
             print('Visit website fail')
 
     def _get_url_context(self, uid, d_type):
-        '''
+        """
         Get urls by raw html and download
 
         Args:
             (String) user id
             (String) download photo/video to file
-        '''
+
+        """
 
         web_page = self._get_raw_page(uid)
 
@@ -206,7 +214,7 @@ class GplusCrawler(object):
                 break
 
     def main(self, uid, d_type='photo'):
-        '''
+        """
         Main function
 
         Args:
@@ -215,7 +223,8 @@ class GplusCrawler(object):
 
         Return:
             (String) execution status
-        '''
+
+        """
 
         # Create folder
         if not os.path.isdir(uid):
