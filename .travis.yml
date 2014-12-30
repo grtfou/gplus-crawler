@@ -1,7 +1,6 @@
 language: python
 
 python:
-  - "2.6"
   - "2.7"
 # command to install dependencies
 before_install:
@@ -9,6 +8,7 @@ before_install:
 # command to install dependencies
 install:
   - "pip install -r requirements.txt"
+  - "apt-get install python-wxgtk3.0 python-wxtools wx3.0-i18n"
   - "pip install ."
   - "python setup.py install"
 # command to run tests
