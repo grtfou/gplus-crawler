@@ -2,18 +2,26 @@
 # -*- coding: utf-8 -*-
 #  @date          20141118
 import configure
-from setuptools import setup, find_packages
+from cx_Freeze import setup, Executable
 
 # base = None
 # if sys.platform == "win32":
     # base = "Win32GUI"
 
+copyDependentFiles = True
+silent = True
+
+includes = ["encodings.utf_8", "encodings.ascii",
+            "os", "re", "sys", "threading",
+            "contextlib", "logging", "requests", "wx"]
+
 setup(name='gplus_crawler',
       version=configure.VERSION,
-      url='https://github.com/grtfou/gplus_crawler',
-      description='Download google plus pictures and videos in message',
-      license='MIT License',
-      install_requires=open('requirements.txt').read().splitlines(),
-      author='grtfou',
-      packages=find_packages(),
+      options={
+        "build_exe":{
+            "includes": includes,
+            "include_msvcr": True,
+        },
+      },
+      executables=[Executable('start_ui.py')],
 )
