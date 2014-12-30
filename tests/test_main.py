@@ -18,9 +18,10 @@ class TestMainFunction(unittest.TestCase):
     def tearDown(self):
         self.user_id = None
 
-    def test_photo(self):
+    def test_video(self):
         main_program = GplusCrawler()
-        result = main_program.main(self.user_id, 'photo')
+        result = main_program.main(self.user_id, 'video')
+        main_program.stop_download = True
 
         self.assertNotEqual(result, 'Connection Fail')
 
