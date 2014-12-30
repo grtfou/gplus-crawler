@@ -3,7 +3,7 @@
 #  @date          20141118
 import configure
 from cx_Freeze import setup, Executable
-
+import requests.certs
 # base = None
 # if sys.platform == "win32":
     # base = "Win32GUI"
@@ -21,6 +21,7 @@ setup(name='gplus_crawler',
         "build_exe":{
             "includes": includes,
             "include_msvcr": True,
+            "include_files":[(requests.certs.where(), 'cacert.pem')],
         },
       },
       executables=[Executable('start_ui.py')],
