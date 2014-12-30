@@ -18,7 +18,6 @@ import requests
 
 logging.basicConfig(level=logging.DEBUG, filename='debug.log')
 CA_PATH = 'cacert.pem'
-logging.exception("Error !! Error:{}".format(CA_PATH))
 
 class GplusCrawler(object):
     '''
