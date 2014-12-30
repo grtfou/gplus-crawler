@@ -1,7 +1,7 @@
 Google Plus Image/Video Crawler
 ===============================
 
-README Last Updated on 2014.12.17
+README Last Updated on 2014.12.30
 
 Introduction
 =============
@@ -14,8 +14,8 @@ Download Google Plus (Google+) ``Pictures`` and ``Videos`` in messages
 Requirements
 =============
 + Python == 2.7
-+ wxPython >= 2.9.4  (For UI)
 + requests == 2.4.3
++ wxPython >= 2.9.4  (For UI)
 + cx_Freeze == 4.3.3 (For compile to .exe file)
 
 
@@ -32,9 +32,10 @@ How to Use
 
 Change log
 ===========
-* ``0.4.1`` (2014-11-17)
+* ``0.4.1`` (2014-12-30)
     * Fixed: connection alive issue
     * Fixed: Service refusing SSLv2 connection
+    * Fixed: Building execution file fail by HTTPS certification
 * ``0.4.0`` (2014-09-08)
     * Added: Video date
     * Fixed: Regex bugs

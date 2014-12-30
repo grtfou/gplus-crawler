@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #  @first_date    20130414
-#  @date          20141117 - Add: Close session
-'''
+#  @date          20141230 - Fix: Certification on HTTPS connection
+"""
 Download photo or videos from google plus
-'''
+"""
+
 from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
