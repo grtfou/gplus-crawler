@@ -11,8 +11,6 @@ from cx_Freeze import setup, Executable
 copyDependentFiles = True
 silent = True
 
-# includes = ["lxml", "lxml._elementpath", "lxml.etree",
-#             "gzip", "encodings.utf_8", "encodings.ascii"]
 includes = ["encodings.utf_8", "encodings.ascii",
             "os", "re", "sys", "threading",
             "contextlib", "logging", "requests", "wx"]

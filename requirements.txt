@@ -1,1 +1,2 @@
 requests==2.4.3
+cx-Freeze==4.3.4
