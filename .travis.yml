@@ -5,10 +5,10 @@ python:
 # command to install dependencies
 before_install:
   - sudo apt-get update -qq
+  - sudo apt-get install python-wxgtk3.0 python-wxtools wx3.0-i18n
 # command to install dependencies
 install:
   - "pip install -r requirements.txt"
-  - "apt-get install python-wxgtk3.0 python-wxtools wx3.0-i18n"
   - "pip install ."
   - "python setup.py install"
 # command to run tests
