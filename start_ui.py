@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 #  @first_date    20130414
 #  @date          20140907 - Enhanced "stop download" feature
-'''
+"""
 UI for windows application
-'''
+"""
+
 import threading
 
 import wx
