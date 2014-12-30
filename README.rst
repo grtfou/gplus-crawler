@@ -3,6 +3,9 @@ Google Plus Image/Video Crawler
 
 README Last Updated on 2014.12.30
 
+|build|
+--------
+
 Introduction
 =============
 Download Google Plus (Google+) ``Pictures`` and ``Videos`` in messages
@@ -36,6 +39,7 @@ Change log
     * Fixed: connection alive issue
     * Fixed: Service refusing SSLv2 connection
     * Fixed: Building execution file fail by HTTPS certification
+    * Enhanced: Support to testing on travis ci
 * ``0.4.0`` (2014-09-08)
     * Added: Video date
     * Fixed: Regex bugs
@@ -53,3 +57,5 @@ Change log
 Licence
 ========
 MIT License
+
+.. |build| image:: https://travis-ci.org/grtfou/gplus-crawler.svg?branch=master)](https://travis-ci.org/grtfou/gplus-crawler
