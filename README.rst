@@ -19,6 +19,7 @@ Requirements
 + Python == 2.7
 + requests == 2.4.3
 + wxPython >= 2.9.4  (For UI)
+  * ex. wxPython-3.0.2.0-cp27-none-win_amd64.whl
 + cx_Freeze == 4.3.3 (For compile to .exe file)
 
 
@@ -26,7 +27,7 @@ How to Use
 ==================
 * Download it (portable)
     * https://github.com/grtfou/gplus-crawler/releases
-    * https://github.com/grtfou/gplus-crawler/releases/download/xxx/gplus-backup.7z
+    * https://github.com/grtfou/gplus-crawler/releases/download/[release-tag]/[filename].7z
 * Uncompress 7z file and execute ``start_ui.exe`` to run
 * Input Google+ id that you want to backup (download) user into text field
     * ex: 105229500895781124316
