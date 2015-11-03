@@ -33,9 +33,9 @@ class GplusCrawler(object):
 
     def __init__(self):
         ### video regex ###
-        # (url: http://redirector.googlevideo.com/videoplayback?id)
-        # g+ source code
-        regx_txt = r".*(https://redirector\.googlevideo\.com.*)\"\]$"
+        # [<quality>,<width>,<height>,"<url>"]
+        # ref: https://github.com/soimort/you-get
+        regx_txt = r".*\[\d+,\d+,\d+,\"([^\"]+)\"\]$"
         self.video_regx = re.compile(regx_txt)
 
         regx_txt = r".*(20[0-9]{1}[0-9]{1}/[0-1][0-9]/[0-3][0-9]).*"
