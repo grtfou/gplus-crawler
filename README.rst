@@ -19,7 +19,6 @@ Requirements
 + Python == 2.7
 + requests == 2.4.3
 + wxPython >= 2.9.4  (For UI)
-    * ex. wxPython-3.0.2.0-cp27-none-win_amd64.whl
 + cx_Freeze == 4.3.3 (For compile to .exe file)
 
 
@@ -63,3 +62,5 @@ MIT License
 
 .. |build| image:: https://travis-ci.org/grtfou/gplus-crawler.svg?branch=master
     :target: https://travis-ci.org/grtfou/gplus-crawler
+
+.. [1] ex. wxPython-3.0.2.0-cp27-none-win_amd64.whl
