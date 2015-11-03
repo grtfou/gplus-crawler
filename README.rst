@@ -1,7 +1,7 @@
-Google Plus Image/Video Crawler
+Google Plus Image / Video Crawler
 ===============================
 
-README Last Updated on 2014.12.30
+README Last Updated on 2015.11.03
 
 |build|
 --------
@@ -25,8 +25,9 @@ Requirements
 How to Use
 ==================
 * Download it (portable)
-    * https://code.google.com/p/gplus-crawler/downloads/list
-* Uncompress and execute ``start_ui.exe`` to run
+    * https://github.com/grtfou/gplus-crawler/releases
+    * https://github.com/grtfou/gplus-crawler/releases/download/xxx/gplus-backup.7z
+* Uncompress 7z file and execute ``start_ui.exe`` to run
 * Input Google+ id that you want to backup (download) user into text field
     * ex: 105229500895781124316
 * Press ``Go Download!`` button
@@ -35,6 +36,8 @@ How to Use
 
 Change log
 ===========
+* ``0.4.2`` (2015-11-03)
+    * Fixed: Regex of video url parser
 * ``0.4.1`` (2014-12-30)
     * Fixed: connection alive issue
     * Fixed: Service refusing SSLv2 connection
