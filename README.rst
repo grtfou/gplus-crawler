@@ -17,9 +17,9 @@ Download Google Plus (Google+) ``Pictures`` and ``Videos`` in messages
 Requirements
 =============
 + Python == 2.7
-+ requests == 2.4.3
-+ wxPython >= 2.9.4  (For UI)
-+ cx_Freeze == 4.3.3 (For compile to .exe file)
++ requests >= 2.4.3
++ wxPython >= 2.9.4  (For UI) [1]_
++ cx_Freeze >= 4.3.3 (For compile to .exe file) [2]_
 
 
 How to Use
@@ -64,3 +64,5 @@ MIT License
     :target: https://travis-ci.org/grtfou/gplus-crawler
 
 .. [1] ex. wxPython-3.0.2.0-cp27-none-win_amd64.whl
+
+.. [2] ex. cx_Freeze-4.3.4-cp27-none-win_amd64.whl
