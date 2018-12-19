@@ -16,10 +16,10 @@ Download Google Plus (Google+) ``Pictures`` and ``Videos`` in messages
 
 Requirements
 =============
-+ Python == 2.7
-+ requests >= 2.4.3
-+ wxPython >= 2.9.4  (For UI)
-+ cx_Freeze >= 4.3.3 (For compile to .exe file)
++ Python == 3.7
++ requests >= 2.21.0
++ wxPython == 4.0.3  (For UI)
++ cx_Freeze == 5.1.1 (For compile to .exe file)
 
 
 How to Use
