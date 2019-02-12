@@ -3,6 +3,14 @@ Google Plus Image / Video Crawler
 
 README Last Updated on 2015.11.03
 
+::
+
+    Shutting down Google+ for consumer (personal) accounts on April 2, 2019
+    (https://support.google.com/plus/answer/9195133)
+    
+    So this repo has been archived.
+
+
 |build|
 --------
 
